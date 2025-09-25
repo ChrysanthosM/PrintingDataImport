@@ -30,8 +30,8 @@ public class FileIntegrationConfig {
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(5);
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(4);
         executor.setThreadNamePrefix("file-worker-");
         executor.initialize();
         return executor;
@@ -44,7 +44,7 @@ public class FileIntegrationConfig {
                                 .filter(new AcceptOnceFileListFilter<>())
                                 .locker(new NioFileLocker())
                                 .preventDuplicates(true),
-                        e -> e.poller(Pollers.fixedDelay(5000)))
+                        e -> e.poller(Pollers.fixedDelay(5000, 5000)))
                 .handle(File.class, (file, headers) -> {
                     int priority = determinePriority(file);
                     fileQueue.offer(new PrioritizedFile(file, priority));
