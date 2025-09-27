@@ -1,0 +1,44 @@
+package org.masouras.model;
+
+import org.springframework.integration.file.filters.FileListFilter;
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Component
+public class FileExtensionFilter implements FileListFilter<File> {
+    private final Set<String> ALLOWED_EXTENSIONS = Set.of("xml", "csv");
+
+    @Override
+    public List<File> filterFiles(File[] files) {
+        return Arrays.stream(files)
+                .filter(this::accept)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean accept(File file) {
+        String name = file.getName();
+        int dotIndex = name.lastIndexOf('.');
+        if (dotIndex == -1) return false;
+
+        String ext = name.substring(dotIndex + 1).toLowerCase();
+        return ALLOWED_EXTENSIONS.contains(ext);
+    }
+
+    @Override
+    public boolean supportsSingleFileFiltering() {
+        return true;
+    }
+
+    @Override
+    public boolean isForRecursion() {
+        return false;
+    }
+}
+
+
