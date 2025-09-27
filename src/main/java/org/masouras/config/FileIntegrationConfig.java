@@ -41,9 +41,9 @@ public class FileIntegrationConfig {
 
     private void handleAndPersistFile(File file) {
         try {
-            byte[] content = java.nio.file.Files.readAllBytes(file.toPath());
+            byte[] fileContent = java.nio.file.Files.readAllBytes(file.toPath());
 
-//                fileRepository.save(new FileEntity(file.getName(), extension, content));
+//                fileRepository.save(new FileEntity(file.getName(), extension, fileContent));
 
             log.info("Saved file '{}' to database", file.getName());
         } catch (IOException e) {
