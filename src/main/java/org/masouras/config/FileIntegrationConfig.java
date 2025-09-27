@@ -20,7 +20,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 @EnableIntegration
 @IntegrationComponentScan
 public class FileIntegrationConfig {
-    private static final String WATCH_FOLDER = "/path/to/watch";
+    private static final String WATCH_FOLDER = "D:/MyDocuments/Programming/Files";
+
 
     @Bean
     public PriorityBlockingQueue<PrioritizedFile> fileQueue() {
@@ -28,10 +29,10 @@ public class FileIntegrationConfig {
     }
 
     @Bean
-    public TaskExecutor taskExecutor() {
+    public TaskExecutor taskExecutorPriority() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(4);
+        executor.setMaxPoolSize(1);
         executor.setThreadNamePrefix("file-worker-");
         executor.initialize();
         return executor;
@@ -54,9 +55,9 @@ public class FileIntegrationConfig {
     }
 
     private int determinePriority(File file) {
-        if (file.getName().contains("urgent")) return 10;
-        if (file.length() > 10_000_000) return 5;
-        return 1;
+        if (file.getName().contains("urgent")) return 30;
+        if (file.getName().contains("report")) return 20;
+        return 10;
     }
 }
 
