@@ -14,6 +14,7 @@ import org.springframework.integration.file.filters.CompositeFileListFilter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @Configuration
@@ -30,7 +31,7 @@ public class FileIntegrationConfig {
                                 .filter(new CompositeFileListFilter<>(List.of(new AcceptOnceFileListFilter<>(), fileExtensionFilter)))
                                 .nioLocker()
                                 .preventDuplicates(true),
-                        e -> e.poller(Pollers.fixedDelay(5000, 1000)))
+                        e -> e.poller(Pollers.fixedDelay(2000, 1000)))
                 .handle(File.class, (file, headers) -> {
                     handleAndPersistFile(file);
                     return null;
@@ -41,9 +42,10 @@ public class FileIntegrationConfig {
 
     private void handleAndPersistFile(File file) {
         try {
-            byte[] fileContent = java.nio.file.Files.readAllBytes(file.toPath());
+            String fileContentBase64 = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(file.toPath()));
 
-//                fileRepository.save(new FileEntity(file.getName(), extension, fileContent));
+
+//                fileRepository.save(new FileEntity(file.getName(), extension, fileContentBase64));
 
             log.info("Saved file '{}' to database", file.getName());
         } catch (IOException e) {
