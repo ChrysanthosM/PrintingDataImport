@@ -14,6 +14,5 @@ public class FileProcessorXML implements FileProcessorBase {
     @Override
     public void process(File file) {
         // XML-specific logic
-        fileProcessed(file);
     }
 }

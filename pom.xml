@@ -80,6 +80,12 @@
             <artifactId>commons-text</artifactId>
             <version>1.14.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.4.8-jre</version>
+        </dependency>
 
     </dependencies>
     <build>

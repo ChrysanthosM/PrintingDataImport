@@ -1,8 +1,8 @@
 package org.masouras.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.model.FileExtensionFilter;
-import org.masouras.model.FileLockedFilter;
+import org.masouras.filter.FileExtensionFilter;
+import org.masouras.filter.FileLockedFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -15,9 +15,6 @@ import org.springframework.integration.file.filters.CompositeFileListFilter;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.util.Base64;
 import java.util.List;
 
@@ -33,9 +30,9 @@ public class FileIntegrationConfig {
         return IntegrationFlow
                 .from(Files.inboundAdapter(new File(WATCH_FOLDER))
                                 .filter(new CompositeFileListFilter<>(List.of(
-                                        new AcceptOnceFileListFilter<>(),
+                                        fileExtensionFilter,
                                         fileLockedFilter,
-                                        fileExtensionFilter)))
+                                        new AcceptOnceFileListFilter<>())))
                                 .preventDuplicates(true),
                         e -> e.poller(Pollers.fixedDelay(2000, 1000)))
                 .handle(File.class, (file, headers) -> {
@@ -49,25 +46,35 @@ public class FileIntegrationConfig {
                 .get();
     }
 
-    private void handleAndDeleteFile(File file) {
-        boolean deleted = file.delete();
-        if (deleted) {
-            log.info("Deleted file '{}'", file.getName());
-        } else {
-            log.warn("Could not delete file '{}'", file.getName());
-        }
+    private File getXmlFile(File okFile) {
+        String baseName = com.google.common.io.Files.getNameWithoutExtension(okFile.getName());
+        return new File(okFile.getParentFile(), baseName + ".xml");
     }
+    private void handleAndDeleteFile(File okFile) {
+        File xmlFile = getXmlFile(okFile);
 
-    private void handleAndPersistFile(File file) {
+        boolean xmlDeleted = xmlFile.delete();
+        if (log.isDebugEnabled()) log.debug("{} xml deleted:{}", xmlFile.getName(), xmlDeleted);
+        if (!xmlDeleted && log.isWarnEnabled()) log.warn("{} xml NOT deleted:", xmlFile.getName());
+
+        boolean okDeleted = okFile.delete();
+        if (log.isDebugEnabled()) log.debug("{} ok deleted:{}", okFile.getName(), okDeleted);
+        if (!okDeleted && log.isWarnEnabled()) log.warn("{} ok NOT deleted:", okFile.getName());
+    }
+    private void handleAndPersistFile(File okFile) {
         try {
-            String fileContentBase64 = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(file.toPath()));
-
-
+            File xmlFile = getXmlFile(okFile);
+            if (xmlFile.exists()) {
+                String xmlContentBase64 = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(xmlFile.toPath()));
 //                fileRepository.save(new FileEntity(file.getName(), extension, fileContentBase64));
 
-            log.info("Saved file '{}' to database", file.getName());
+                if (log.isInfoEnabled()) log.info("Saved XML file '{}' to database", xmlFile.getName());
+            } else {
+                if (log.isWarnEnabled()) log.warn("Expected XML file '{}' not found for OK file '{}'", xmlFile.getName(), okFile.getName());
+            }
+
         } catch (IOException e) {
-            log.error("Failed to read or save file: {}", file.getAbsolutePath(), e);
+            log.error("Failed to read or save file: {}", okFile.getAbsolutePath(), e);
         }
     }
 }
