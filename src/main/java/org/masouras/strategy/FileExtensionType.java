@@ -3,7 +3,6 @@ package org.masouras.strategy;
 import lombok.Getter;
 
 public enum FileExtensionType {
-    OK("ok"),
     XML("xml"),
     ;
 
