@@ -43,11 +43,11 @@ public class FileIntegrationConfig {
                                 .preventDuplicates(true),
                         e -> e.poller(Pollers.fixedDelay(2000, 1000)))
                 .handle(File.class, (file, headers) -> {
-                    fileIntegrationHandler.handleAndPersistFile(file);
+                    if (!fileIntegrationHandler.handleAndPersistFile(file)) return null;
                     return file;
                 })
                 .handle(File.class, (file, headers) -> {
-                    fileIntegrationHandler.handleAndDeleteFile(file);
+                    if (file != null) fileIntegrationHandler.handleAndDeleteFile(file);
                     return null;
                 })
                 .get();
