@@ -13,16 +13,22 @@ import java.util.Base64;
 public class FileIntegrationHandler {
 
     public boolean handleAndPersistFile(File okFile) {
+        File xmlFile = getXmlFile(okFile);
+        if (!xmlFile.exists()) {
+            if (log.isWarnEnabled()) log.warn("Expected XML file '{}' not found for OK file '{}'", xmlFile.getName(), okFile.getName());
+            return false;
+        }
+        return handleAndPersistFileMain(okFile, xmlFile);
+    }
+    private boolean handleAndPersistFileMain(File okFile, File xmlFile) {
         try {
-            File xmlFile = getXmlFile(okFile);
-            if (xmlFile.exists()) {
-                String xmlContentBase64 = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(xmlFile.toPath()));
+            String xmlContentBase64 = Base64.getEncoder().encodeToString(java.nio.file.Files.readAllBytes(xmlFile.toPath()));
+
+
+
 //                fileRepository.save(new FileEntity(file.getName(), extension, fileContentBase64));
 
-                if (log.isInfoEnabled()) log.info("Saved XML file '{}' to database", xmlFile.getName());
-            } else {
-                if (log.isWarnEnabled()) log.warn("Expected XML file '{}' not found for OK file '{}'", xmlFile.getName(), okFile.getName());
-            }
+            if (log.isInfoEnabled()) log.info("Saved XML file '{}' to database", xmlFile.getName());
             return true;
         } catch (IOException e) {
             log.error("Failed to read or save file: {}", okFile.getAbsolutePath(), e);
