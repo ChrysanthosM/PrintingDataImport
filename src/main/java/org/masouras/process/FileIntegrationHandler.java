@@ -1,7 +1,8 @@
 package org.masouras.process;
 
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.FileExtensionType;
+import org.masouras.config.FileExtensionType;
+import org.masouras.data.FileOnDiscActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +41,4 @@ public class FileIntegrationHandler {
         fileOnDiscActions.deleteFile(relevantFile);
         fileOnDiscActions.deleteFile(okFile);
     }
-
 }

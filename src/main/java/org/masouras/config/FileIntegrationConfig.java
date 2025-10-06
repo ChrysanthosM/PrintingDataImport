@@ -1,7 +1,6 @@
 package org.masouras.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.FileExtensionType;
 import org.masouras.filter.FileExtensionFilter;
 import org.masouras.filter.FileLockedFilter;
 import org.masouras.process.FileIntegrationHandler;
