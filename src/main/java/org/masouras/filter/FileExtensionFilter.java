@@ -22,11 +22,7 @@ public class FileExtensionFilter implements FileListFilter<File> {
 
     @Override
     public boolean accept(File file) {
-        String name = file.getName();
-        int dotIndex = name.lastIndexOf('.');
-        if (dotIndex == -1) return false;
-
-        String ext = name.substring(dotIndex + 1).toLowerCase();
+        String ext = com.google.common.io.Files.getFileExtension(file.getName()).toLowerCase();
         return ALLOWED_EXTENSIONS.contains(ext);
     }
 

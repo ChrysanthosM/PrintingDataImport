@@ -1,6 +1,7 @@
 package org.masouras.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.masouras.FileExtensionType;
 import org.masouras.filter.FileExtensionFilter;
 import org.masouras.filter.FileLockedFilter;
 import org.masouras.process.FileIntegrationHandler;
@@ -43,11 +44,11 @@ public class FileIntegrationConfig {
                                 .preventDuplicates(true),
                         e -> e.poller(Pollers.fixedDelay(2000, 1000)))
                 .handle(File.class, (file, headers) -> {
-                    if (!fileIntegrationHandler.handleAndPersistFile(file)) return null;
+                    if (!fileIntegrationHandler.handleAndPersistFile(file, FileExtensionType.XML)) return null;
                     return file;
                 })
                 .handle(File.class, (file, headers) -> {
-                    if (file != null) fileIntegrationHandler.handleAndDeleteFile(file);
+                    if (file != null) fileIntegrationHandler.handleAndDeleteFile(file, FileExtensionType.XML);
                     return null;
                 })
                 .get();
