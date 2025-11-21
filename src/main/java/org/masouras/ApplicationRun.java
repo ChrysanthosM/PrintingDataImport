@@ -5,9 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "org.masouras")
 public class ApplicationRun {
-    static void main(String[] args) {
+    public static void main(String[] args) {
         SpringApplication.run(ApplicationRun.class, args);
     }
 }
