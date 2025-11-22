@@ -14,12 +14,12 @@ import java.io.File;
 @Slf4j
 public class FileIntegrationHandler {
     private final FileOnDiscActions fileOnDiscActions;
-    private final ActivityJ2SQL activityJ2SQL;
+//    private final ActivityJ2SQL activityJ2SQL;
 
     @Autowired
-    public FileIntegrationHandler(FileOnDiscActions fileOnDiscActions, ActivityJ2SQL activityJ2SQL) {
+    public FileIntegrationHandler(FileOnDiscActions fileOnDiscActions) { //, ActivityJ2SQL activityJ2SQL) {
         this.fileOnDiscActions = fileOnDiscActions;
-        this.activityJ2SQL = activityJ2SQL;
+//        this.activityJ2SQL = activityJ2SQL;
     }
 
     public boolean handleAndPersistFile(File okFile, FileExtensionType fileExtensionType) {
@@ -34,7 +34,7 @@ public class FileIntegrationHandler {
         String xmlContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
         if (xmlContentBase64 == null) return false;
 
-        String insertActivitySQL = activityJ2SQL.getSQL(ActivityRepo.NameOfSQL.INSERT);
+//        String insertActivitySQL = activityJ2SQL.getSQL(ActivityRepo.NameOfSQL.INSERT);
 
 
 //        fileRepository.save(new FileEntity(file.getName(), extension, fileContentBase64));
