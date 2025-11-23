@@ -3,8 +3,6 @@ package org.masouras.process;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.config.FileExtensionType;
 import org.masouras.data.service.FileOnDiscActions;
-import org.masouras.printing.sqlite.repo.squad.data.ActivityJ2SQL;
-import org.masouras.printing.sqlite.repo.squad.data.ActivityRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +12,10 @@ import java.io.File;
 @Slf4j
 public class FileIntegrationHandler {
     private final FileOnDiscActions fileOnDiscActions;
-//    private final ActivityJ2SQL activityJ2SQL;
 
     @Autowired
-    public FileIntegrationHandler(FileOnDiscActions fileOnDiscActions) { //, ActivityJ2SQL activityJ2SQL) {
+    public FileIntegrationHandler(FileOnDiscActions fileOnDiscActions) {
         this.fileOnDiscActions = fileOnDiscActions;
-//        this.activityJ2SQL = activityJ2SQL;
     }
 
     public boolean handleAndPersistFile(File okFile, FileExtensionType fileExtensionType) {
@@ -34,7 +30,6 @@ public class FileIntegrationHandler {
         String xmlContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
         if (xmlContentBase64 == null) return false;
 
-//        String insertActivitySQL = activityJ2SQL.getSQL(ActivityRepo.NameOfSQL.INSERT);
 
 
 //        fileRepository.save(new FileEntity(file.getName(), extension, fileContentBase64));
