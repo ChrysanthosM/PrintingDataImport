@@ -2,6 +2,7 @@ package org.masouras.process;
 
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.config.FileExtensionType;
+import org.masouras.data.service.FileOnDBActions;
 import org.masouras.data.service.FileOnDiscActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,12 +11,14 @@ import java.io.File;
 
 @Service
 @Slf4j
-public class FileIntegrationHandler {
+public class FileIntegrationControl {
     private final FileOnDiscActions fileOnDiscActions;
+    private final FileOnDBActions fileOnDBActions;
 
     @Autowired
-    public FileIntegrationHandler(FileOnDiscActions fileOnDiscActions) {
+    public FileIntegrationControl(FileOnDiscActions fileOnDiscActions, FileOnDBActions fileOnDBActions) {
         this.fileOnDiscActions = fileOnDiscActions;
+        this.fileOnDBActions = fileOnDBActions;
     }
 
     public boolean handleAndPersistFile(File okFile, FileExtensionType fileExtensionType) {
@@ -30,6 +33,7 @@ public class FileIntegrationHandler {
         String xmlContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
         if (xmlContentBase64 == null) return false;
 
+        fileOnDBActions.createActivity();
 
 
 //        fileRepository.save(new FileEntity(file.getName(), extension, fileContentBase64));

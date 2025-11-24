@@ -3,7 +3,7 @@ package org.masouras.config;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.filter.FileExtensionFilter;
 import org.masouras.filter.FileLockedFilter;
-import org.masouras.process.FileIntegrationHandler;
+import org.masouras.process.FileIntegrationControl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +25,11 @@ import java.util.List;
 public class FileIntegrationConfig {
     private static final String WATCH_FOLDER = "D:/MyDocuments/Programming/Files";
 
-    private final FileIntegrationHandler fileIntegrationHandler;
+    private final FileIntegrationControl fileIntegrationControl;
 
     @Autowired
-    public FileIntegrationConfig(FileIntegrationHandler fileIntegrationHandler) {
-        this.fileIntegrationHandler = fileIntegrationHandler;
+    public FileIntegrationConfig(FileIntegrationControl fileIntegrationControl) {
+        this.fileIntegrationControl = fileIntegrationControl;
     }
 
     @Bean
@@ -43,11 +43,11 @@ public class FileIntegrationConfig {
                                 .preventDuplicates(true),
                         e -> e.poller(Pollers.fixedDelay(2000, 1000)))
                 .handle(File.class, (file, headers) -> {
-                    if (!fileIntegrationHandler.handleAndPersistFile(file, FileExtensionType.XML)) return null;
+                    if (!fileIntegrationControl.handleAndPersistFile(file, FileExtensionType.XML)) return null;
                     return file;
                 })
                 .handle(File.class, (file, headers) -> {
-                    if (file != null) fileIntegrationHandler.handleAndDeleteFile(file, FileExtensionType.XML);
+                    if (file != null) fileIntegrationControl.handleAndDeleteFile(file, FileExtensionType.XML);
                     return null;
                 })
                 .get();
