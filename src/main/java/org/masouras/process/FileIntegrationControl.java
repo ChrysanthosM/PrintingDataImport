@@ -33,7 +33,7 @@ public class FileIntegrationControl {
         String xmlContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
         if (xmlContentBase64 == null) return false;
 
-        fileOnDBActions.createActivity();
+        Long activityId = fileOnDBActions.createActivity();
 
 
 //        fileRepository.save(new FileEntity(file.getName(), extension, fileContentBase64));
