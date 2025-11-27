@@ -6,6 +6,7 @@ import org.masouras.data.service.FileOnDBActions;
 import org.masouras.data.service.FileOnDiscActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 
@@ -29,6 +30,7 @@ public class FileIntegrationControl {
         }
         return handleAndPersistFileMain(okFile, relevantFile);
     }
+    @Transactional
     private boolean handleAndPersistFileMain(File okFile, File relevantFile) {
         String xmlContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
         if (xmlContentBase64 == null) return false;
