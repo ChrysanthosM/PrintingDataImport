@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.masouras.config.FileExtensionType;
 import org.masouras.data.service.FileOnDBActions;
 import org.masouras.data.service.FileOnDiscActions;
+import org.masouras.printing.sqlite.schema.entity.ActivityEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,17 +29,17 @@ public class FileIntegrationControl {
             if (log.isWarnEnabled()) log.warn("Expected Relevant file '{}' not found for OK file '{}'", relevantFile.getName(), okFile.getName());
             return false;
         }
-        return handleAndPersistFileMain(okFile, relevantFile);
+        return handleAndPersistFileMain(fileExtensionType, relevantFile);
     }
     @Transactional
-    private boolean handleAndPersistFileMain(File okFile, File relevantFile) {
-        String xmlContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
-        if (xmlContentBase64 == null) return false;
+    private boolean handleAndPersistFileMain(FileExtensionType fileExtensionType, File relevantFile) {
+        String fileContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
+        if (fileContentBase64 == null) return false;
 
-        Long activityId = fileOnDBActions.createActivity();
+        ActivityEntity activityEntity = fileOnDBActions.createActivity(fileExtensionType);
+        Long insertedId = fileOnDBActions.savePrintingData(activityEntity, relevantFile, fileContentBase64);
+        if (log.isDebugEnabled()) log.debug("PrintingData Inserted with ID: {} and activity: {}", insertedId, activityEntity.getId());
 
-
-//        fileRepository.save(new FileEntity(file.getName(), extension, fileContentBase64));
         return true;
     }
 
