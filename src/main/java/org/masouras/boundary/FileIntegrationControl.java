@@ -1,9 +1,11 @@
 package org.masouras.boundary;
 
+import com.google.common.base.Preconditions;
 import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.masouras.data.control.CsvParser;
 import org.masouras.data.control.FileOkAdapter;
 import org.masouras.data.domain.FileOkDto;
@@ -90,8 +92,14 @@ public class FileIntegrationControl {
 
 
     public void handleErrorFile(@NonNull File okFile, String errorFolder) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(errorFolder));
+
         fileOnDiscActions.copyFile(okFile, errorFolder);
-
+        List<String> possibleRelevantFileNames = fileOnDiscActions.getPossibleRelevantFileNames(okFile);
+        if (CollectionUtils.isEmpty(possibleRelevantFileNames)) return;
+        possibleRelevantFileNames.stream()
+                .map(File::new)
+                .filter(file -> file.exists() && file.isFile())
+                .forEach(file -> fileOnDiscActions.moveFile(file, errorFolder));
     }
-
 }
