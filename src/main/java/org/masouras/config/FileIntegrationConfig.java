@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.masouras.control.filter.FileExtensionFilter;
 import org.masouras.boundary.FileIntegrationControl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -22,7 +23,8 @@ import java.util.List;
 @IntegrationComponentScan
 @Slf4j
 public class FileIntegrationConfig {
-    private static final String WATCH_FOLDER = "D:/MyDocuments/Programming/Files";
+    @Value("${watch.folder:null}") private String watchFolder;
+    @Value("${error.folder:null}") private String errorFolder;
 
     private final FileIntegrationControl fileIntegrationControl;
 
@@ -32,9 +34,9 @@ public class FileIntegrationConfig {
     }
 
     @Bean
-    public IntegrationFlow filePollingFlow(FileExtensionFilter fileExtensionFilter) {
+    public IntegrationFlow okPollingFlow(FileExtensionFilter fileExtensionFilter) {
         return IntegrationFlow
-                .from(Files.inboundAdapter(new File(WATCH_FOLDER))
+                .from(Files.inboundAdapter(new File(watchFolder))
                                 .filter(new CompositeFileListFilter<>(List.of(
                                         fileExtensionFilter,
                                         new AcceptOnceFileListFilter<>()))
@@ -42,7 +44,7 @@ public class FileIntegrationConfig {
                                 .preventDuplicates(true),
                         e -> e.poller(Pollers.fixedDelay(2000, 1000)))
                 .handle(File.class, (file, headers) -> {
-                    fileIntegrationControl.handleAndPersistFile(file);
+                    if (!fileIntegrationControl.handleAndPersistFile(file)) fileIntegrationControl.handleErrorFile(file, errorFolder); ;
                     return file;
                 })
                 .handle(Files.outboundAdapter(new File("archive"))

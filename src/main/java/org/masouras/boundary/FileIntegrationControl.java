@@ -30,28 +30,29 @@ public class FileIntegrationControl {
         this.fileOnDBActions = fileOnDBActions;
     }
 
-    public void handleAndPersistFile(@NonNull File okFile) {
+    public boolean handleAndPersistFile(@NonNull File okFile) {
         FileOkRaw fileOkRaw = getFileOkContent(okFile);
         if (fileOkRaw == null) {
             if (log.isWarnEnabled()) log.warn("Expected Content inside file {}", okFile.getName());
-            return;
+            return false;
         }
         FileOkDto fileOkDto = getFileOkDto(fileOkRaw, okFile);
-        if (fileOkDto == null) return;
+        if (fileOkDto == null) return false;
 
         File relevantFile = fileOnDiscActions.getRelevantFile(okFile, fileOkDto);
         if (!relevantFile.exists() || !relevantFile.isFile()) {
             if (log.isWarnEnabled()) log.warn("Expected Relevant file '{}' not found for OK file '{}'", relevantFile.getName(), okFile.getName());
-            return;
+            return false;
         }
 
         if (!handleAndPersistFileMain(fileOkDto, relevantFile)) {
             if (log.isWarnEnabled()) log.warn("Relevant file didn't persisted '{}'", relevantFile.getName());
-            return;
+            return false;
         }
 
         fileOnDiscActions.deleteFile(relevantFile);
         if (log.isDebugEnabled()) log.debug("Relevant file persisted '{}'", okFile.getName());
+        return true;
     }
     private @Nullable FileOkDto getFileOkDto(@NonNull FileOkRaw fileOkRaw, @NonNull File okFile) {
         FileOkDto fileOkDto = FileOkAdapter.toFileOkDto(fileOkRaw);
@@ -86,4 +87,11 @@ public class FileIntegrationControl {
         List<FileOkRaw> fileOkRawList = fileOnDiscActions.getCsvContent(FileOkRaw.class, fileOk, CsvParser.DelimiterType.PIPE);
         return CollectionUtils.isEmpty(fileOkRawList) ? null : fileOkRawList.getFirst();
     }
+
+
+    public void handleErrorFile(@NonNull File okFile, String errorFolder) {
+        fileOnDiscActions.copyFile(okFile, errorFolder);
+
+    }
+
 }
