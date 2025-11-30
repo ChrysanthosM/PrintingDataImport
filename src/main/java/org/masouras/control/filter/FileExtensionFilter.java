@@ -1,4 +1,4 @@
-package org.masouras.filter;
+package org.masouras.control.filter;
 
 import org.springframework.integration.file.filters.FileListFilter;
 import org.springframework.stereotype.Component;

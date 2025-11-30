@@ -1,4 +1,4 @@
-package org.masouras.process;
+package org.masouras.control;
 
 import jakarta.annotation.Nullable;
 import lombok.NonNull;
@@ -8,9 +8,9 @@ import org.masouras.data.control.CsvParser;
 import org.masouras.data.control.FileOkAdapter;
 import org.masouras.data.domain.FileOkDto;
 import org.masouras.data.domain.FileOkRaw;
-import org.masouras.data.service.FileOnDBActions;
-import org.masouras.data.service.FileOnDiscActions;
-import org.masouras.printing.sqlite.schema.entity.ActivityEntity;
+import org.masouras.data.boundary.FileOnDBActions;
+import org.masouras.data.boundary.FileOnDiscActions;
+import org.masouras.printing.sqlite.schema.jpa.entity.ActivityEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +51,7 @@ public class FileIntegrationControl {
         }
 
         fileOnDiscActions.deleteFile(relevantFile);
+        if (log.isDebugEnabled()) log.debug("Relevant file persisted '{}'", okFile.getName());
     }
     private @Nullable FileOkDto getFileOkDto(@NonNull FileOkRaw fileOkRaw, @NonNull File okFile) {
         FileOkDto fileOkDto = FileOkAdapter.toFileOkDto(fileOkRaw);

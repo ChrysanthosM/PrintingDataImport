@@ -1,8 +1,8 @@
 package org.masouras.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.filter.FileExtensionFilter;
-import org.masouras.process.FileIntegrationControl;
+import org.masouras.control.filter.FileExtensionFilter;
+import org.masouras.control.FileIntegrationControl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
