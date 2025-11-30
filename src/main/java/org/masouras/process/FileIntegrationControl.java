@@ -1,11 +1,13 @@
 package org.masouras.process;
 
+import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.masouras.config.FileExtensionType;
 import org.masouras.data.control.CsvParser;
-import org.masouras.data.domain.FileOkRecord;
+import org.masouras.data.control.FileOkAdapter;
+import org.masouras.data.domain.FileOkDto;
+import org.masouras.data.domain.FileOkRaw;
 import org.masouras.data.service.FileOnDBActions;
 import org.masouras.data.service.FileOnDiscActions;
 import org.masouras.printing.sqlite.schema.entity.ActivityEntity;
@@ -29,44 +31,58 @@ public class FileIntegrationControl {
     }
 
     public void handleAndPersistFile(@NonNull File okFile) {
-        FileOkRecord fileOkRecord = getFileOkContent(okFile);
-        if (fileOkRecord == null) {
+        FileOkRaw fileOkRaw = getFileOkContent(okFile);
+        if (fileOkRaw == null) {
             if (log.isWarnEnabled()) log.warn("Expected Content inside file {}", okFile.getName());
             return;
         }
-        FileExtensionType fileExtensionType = FileExtensionType.getFormExtension(fileOkRecord.getRelevantFileExtension());
-        if (fileExtensionType == null) {
-            if (log.isWarnEnabled()) log.warn("fileExtensionType not found inside file '{}'", okFile.getName());
-            return;
-        }
+        FileOkDto fileOkDto = getFileOkDto(fileOkRaw, okFile);
+        if (fileOkDto == null) return;
 
-        File relevantFile = fileOnDiscActions.getRelevantFile(okFile, fileExtensionType);
+        File relevantFile = fileOnDiscActions.getRelevantFile(okFile, fileOkDto);
         if (!relevantFile.exists() || !relevantFile.isFile()) {
             if (log.isWarnEnabled()) log.warn("Expected Relevant file '{}' not found for OK file '{}'", relevantFile.getName(), okFile.getName());
             return;
         }
 
-        if (!handleAndPersistFileMain(fileExtensionType, relevantFile)) {
+        if (!handleAndPersistFileMain(fileOkDto, relevantFile)) {
             if (log.isWarnEnabled()) log.warn("Relevant file didn't persisted '{}'", relevantFile.getName());
             return;
         }
 
         fileOnDiscActions.deleteFile(relevantFile);
     }
+    private @Nullable FileOkDto getFileOkDto(@NonNull FileOkRaw fileOkRaw, @NonNull File okFile) {
+        FileOkDto fileOkDto = FileOkAdapter.toFileOkDto(fileOkRaw);
+        if (fileOkDto.getFileExtensionType() == null) {
+            if (log.isWarnEnabled()) log.warn("fileExtensionType not found inside file '{}'", okFile.getName());
+            return null;
+        }
+        if (fileOkDto.getActivityType() == null) {
+            if (log.isWarnEnabled()) log.warn("activityType not found inside file '{}'", okFile.getName());
+            return null;
+        }
+        if (fileOkDto.getContentType() == null) {
+            if (log.isWarnEnabled()) log.warn("contentType not found inside file '{}'", okFile.getName());
+            return null;
+        }
+        return fileOkDto;
+    }
+
     @Transactional
-    private boolean handleAndPersistFileMain(@NonNull FileExtensionType fileExtensionType, @NonNull File relevantFile) {
+    private boolean handleAndPersistFileMain(@NonNull FileOkDto fileOkDto, @NonNull File relevantFile) {
         String fileContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
         if (fileContentBase64 == null) return false;
 
-        ActivityEntity activityEntity = fileOnDBActions.createActivity(fileExtensionType);
-        Long insertedId = fileOnDBActions.savePrintingData(activityEntity, relevantFile, fileContentBase64);
+        ActivityEntity activityEntity = fileOnDBActions.createActivity(fileOkDto.getActivityType());
+        Long insertedId = fileOnDBActions.savePrintingData(activityEntity, fileOkDto.getContentType(), fileContentBase64);
         if (log.isDebugEnabled()) log.debug("PrintingData Inserted with ID: {} and activity: {}", insertedId, activityEntity.getId());
 
         return true;
     }
 
-    public FileOkRecord getFileOkContent(@NonNull File fileOk) {
-        List<FileOkRecord> fileOkRecords = fileOnDiscActions.getCsvContent(FileOkRecord.class, fileOk, CsvParser.DelimiterType.PIPE);
-        return CollectionUtils.isEmpty(fileOkRecords) ? null : fileOkRecords.getFirst();
+    public FileOkRaw getFileOkContent(@NonNull File fileOk) {
+        List<FileOkRaw> fileOkRawList = fileOnDiscActions.getCsvContent(FileOkRaw.class, fileOk, CsvParser.DelimiterType.PIPE);
+        return CollectionUtils.isEmpty(fileOkRawList) ? null : fileOkRawList.getFirst();
     }
 }

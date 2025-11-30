@@ -37,7 +37,8 @@ public class FileIntegrationConfig {
                 .from(Files.inboundAdapter(new File(WATCH_FOLDER))
                                 .filter(new CompositeFileListFilter<>(List.of(
                                         fileExtensionFilter,
-                                        new AcceptOnceFileListFilter<>())))
+                                        new AcceptOnceFileListFilter<>()))
+                                )
                                 .preventDuplicates(true),
                         e -> e.poller(Pollers.fixedDelay(2000, 1000)))
                 .handle(File.class, (file, headers) -> {
