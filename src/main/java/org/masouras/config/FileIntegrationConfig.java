@@ -41,10 +41,10 @@ public class FileIntegrationConfig {
                                         fileExtensionFilter,
                                         new AcceptOnceFileListFilter<>()))
                                 )
-                                .preventDuplicates(true),
-                        e -> e.poller(Pollers.fixedDelay(2000, 1000)))
+                                .preventDuplicates(true)
+                        , e -> e.poller(Pollers.fixedDelay(2000, 1000)))
                 .handle(File.class, (file, headers) -> {
-                    if (!fileIntegrationControl.handleAndPersistFile(file)) fileIntegrationControl.handleErrorFile(file, errorFolder); ;
+                    if (!fileIntegrationControl.handleAndPersistFile(file)) fileIntegrationControl.handleErrorFile(file, errorFolder);
                     return file;
                 })
                 .handle(Files.outboundAdapter(new File("archive"))

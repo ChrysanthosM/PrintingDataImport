@@ -1,5 +1,6 @@
 package org.masouras.control.filter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.integration.file.filters.FileListFilter;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ public class FileExtensionFilter implements FileListFilter<File> {
 
     @Override
     public boolean accept(File file) {
-        String ext = com.google.common.io.Files.getFileExtension(file.getName()).toLowerCase();
+        String ext = FilenameUtils.getExtension(file.getName()).toLowerCase();
         return ALLOWED_EXTENSIONS.contains(ext);
     }
 
