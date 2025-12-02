@@ -74,7 +74,7 @@ public class FileIntegrationControl {
     }
 
     @Transactional
-    private boolean handleAndPersistFileMain(@NonNull FileOkDto fileOkDto, @NonNull File relevantFile) {
+    private boolean handleAndPersistFileMain(FileOkDto fileOkDto, File relevantFile) {
         String fileContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
         if (fileContentBase64 == null) return false;
 
@@ -85,8 +85,8 @@ public class FileIntegrationControl {
         return true;
     }
 
-    public FileOkRaw getFileOkContent(@NonNull File fileOk) {
-        List<FileOkRaw> fileOkRawList = fileOnDiscActions.getCsvContent(FileOkRaw.class, fileOk, CsvParser.DelimiterType.PIPE);
+    public @Nullable FileOkRaw getFileOkContent(@NonNull File fileOk) {
+        List<FileOkRaw> fileOkRawList = fileOnDiscActions.getCsvContent(FileOkRaw.class, CsvParser.DelimiterType.PIPE, fileOk);
         return CollectionUtils.isEmpty(fileOkRawList) ? null : fileOkRawList.getFirst();
     }
 
