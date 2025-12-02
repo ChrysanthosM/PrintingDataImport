@@ -32,18 +32,18 @@ public class FileIntegrationControl {
         this.fileOnDBActions = fileOnDBActions;
     }
 
-    public boolean handleAndPersistFile(@NonNull File okFile) {
-        FileOkRaw fileOkRaw = getFileOkContent(okFile);
+    public boolean handleAndPersistFile(@NonNull File fileOk) {
+        FileOkRaw fileOkRaw = getFileOkContent(fileOk);
         if (fileOkRaw == null) {
-            if (log.isWarnEnabled()) log.warn("Expected Content inside file {}", okFile.getName());
+            if (log.isWarnEnabled()) log.warn("Expected Content inside file {}", fileOk.getName());
             return false;
         }
-        FileOkDto fileOkDto = getFileOkDto(fileOkRaw, okFile);
+        FileOkDto fileOkDto = getFileOkDto(fileOkRaw, fileOk);
         if (fileOkDto == null) return false;
 
-        File relevantFile = fileOnDiscActions.getRelevantFile(okFile, fileOkDto);
+        File relevantFile = fileOnDiscActions.getRelevantFile(fileOk, fileOkDto);
         if (!relevantFile.exists() || !relevantFile.isFile()) {
-            if (log.isWarnEnabled()) log.warn("Expected Relevant file '{}' not found for OK file '{}'", relevantFile.getName(), okFile.getName());
+            if (log.isWarnEnabled()) log.warn("Expected Relevant file '{}' not found for OK file '{}'", relevantFile.getName(), fileOk.getName());
             return false;
         }
 
@@ -53,21 +53,21 @@ public class FileIntegrationControl {
         }
 
         fileOnDiscActions.deleteFile(relevantFile);
-        if (log.isDebugEnabled()) log.debug("Relevant file persisted '{}'", okFile.getName());
+        if (log.isDebugEnabled()) log.debug("Relevant file persisted '{}'", fileOk.getName());
         return true;
     }
-    private @Nullable FileOkDto getFileOkDto(@NonNull FileOkRaw fileOkRaw, @NonNull File okFile) {
+    private @Nullable FileOkDto getFileOkDto(@NonNull FileOkRaw fileOkRaw, @NonNull File fileOk) {
         FileOkDto fileOkDto = FileOkAdapter.toFileOkDto(fileOkRaw);
         if (fileOkDto.getFileExtensionType() == null) {
-            if (log.isWarnEnabled()) log.warn("fileExtensionType not found inside file '{}'", okFile.getName());
+            if (log.isWarnEnabled()) log.warn("fileExtensionType not found inside file '{}'", fileOk.getName());
             return null;
         }
         if (fileOkDto.getActivityType() == null) {
-            if (log.isWarnEnabled()) log.warn("activityType not found inside file '{}'", okFile.getName());
+            if (log.isWarnEnabled()) log.warn("activityType not found inside file '{}'", fileOk.getName());
             return null;
         }
         if (fileOkDto.getContentType() == null) {
-            if (log.isWarnEnabled()) log.warn("contentType not found inside file '{}'", okFile.getName());
+            if (log.isWarnEnabled()) log.warn("contentType not found inside file '{}'", fileOk.getName());
             return null;
         }
         return fileOkDto;
@@ -91,15 +91,17 @@ public class FileIntegrationControl {
     }
 
 
-    public void handleErrorFile(@NonNull File okFile, String errorFolder) {
+    public void handleErrorFile(@NonNull File fileOk, String errorFolder) {
         Preconditions.checkArgument(StringUtils.isNotBlank(errorFolder));
 
-        fileOnDiscActions.copyFile(okFile, errorFolder);
-        List<String> possibleRelevantFileNames = fileOnDiscActions.getPossibleRelevantFileNames(okFile);
+        fileOnDiscActions.copyFile(fileOk, errorFolder);
+        List<String> possibleRelevantFileNames = fileOnDiscActions.getPossibleRelevantFileNames(fileOk);
         if (CollectionUtils.isEmpty(possibleRelevantFileNames)) return;
         possibleRelevantFileNames.stream()
                 .map(File::new)
                 .filter(file -> file.exists() && file.isFile())
                 .forEach(file -> fileOnDiscActions.moveFile(file, errorFolder));
+
+
     }
 }
