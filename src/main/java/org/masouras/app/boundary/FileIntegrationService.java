@@ -13,6 +13,7 @@ import org.masouras.data.domain.FileOkRaw;
 import org.masouras.data.boundary.FileOnDBActions;
 import org.masouras.data.boundary.FileOnDiscActions;
 import org.masouras.printing.sqlite.schema.jpa.entity.ActivityEntity;
+import org.masouras.trace.annotation.Traceable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +23,17 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class FileIntegrationControl {
+public class FileIntegrationService {
     private final FileOnDiscActions fileOnDiscActions;
     private final FileOnDBActions fileOnDBActions;
 
     @Autowired
-    public FileIntegrationControl(FileOnDiscActions fileOnDiscActions, FileOnDBActions fileOnDBActions) {
+    public FileIntegrationService(FileOnDiscActions fileOnDiscActions, FileOnDBActions fileOnDBActions) {
         this.fileOnDiscActions = fileOnDiscActions;
         this.fileOnDBActions = fileOnDBActions;
     }
 
+    @Traceable
     public boolean handleAndPersistFile(@NonNull File fileOk) {
         FileOkRaw fileOkRaw = getFileOkContent(fileOk);
         if (fileOkRaw == null) {

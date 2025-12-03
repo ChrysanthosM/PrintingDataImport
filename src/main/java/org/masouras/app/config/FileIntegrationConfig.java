@@ -2,7 +2,7 @@ package org.masouras.app.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.app.control.filter.FileExtensionFilter;
-import org.masouras.app.boundary.FileIntegrationControl;
+import org.masouras.app.boundary.FileIntegrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,11 +26,11 @@ public class FileIntegrationConfig {
     @Value("${watch.folder:null}") private String watchFolder;
     @Value("${error.folder:null}") private String errorFolder;
 
-    private final FileIntegrationControl fileIntegrationControl;
+    private final FileIntegrationService fileIntegrationService;
 
     @Autowired
-    public FileIntegrationConfig(FileIntegrationControl fileIntegrationControl) {
-        this.fileIntegrationControl = fileIntegrationControl;
+    public FileIntegrationConfig(FileIntegrationService fileIntegrationService) {
+        this.fileIntegrationService = fileIntegrationService;
     }
 
     @Bean
@@ -44,7 +44,7 @@ public class FileIntegrationConfig {
                                 .preventDuplicates(true)
                         , e -> e.poller(Pollers.fixedDelay(2000, 1000)))
                 .handle(File.class, (file, headers) -> {
-                    if (!fileIntegrationControl.handleAndPersistFile(file)) fileIntegrationControl.handleErrorFile(file, errorFolder);
+                    if (!fileIntegrationService.handleAndPersistFile(file)) fileIntegrationService.handleErrorFile(file, errorFolder);
                     return file;
                 })
                 .handle(Files.outboundAdapter(new File("archive"))
