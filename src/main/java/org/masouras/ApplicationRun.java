@@ -2,9 +2,12 @@ package org.masouras;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-//@ComponentScan(basePackages = "org.masouras")
+@EnableMongoRepositories
+@EnableScheduling
 public class ApplicationRun {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationRun.class, args);
