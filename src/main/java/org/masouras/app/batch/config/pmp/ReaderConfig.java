@@ -1,9 +1,9 @@
 package org.masouras.app.batch.config.pmp;
 
 import org.masouras.app.batch.control.PrintingDataRowMapper;
-import org.masouras.printing.mssql.repo.PrintingDataRepo;
-import org.masouras.printing.mssql.repo.PrintingDataSQL;
-import org.masouras.printing.mssql.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.squad.printing.mssql.repo.PrintingDataRepo;
+import org.masouras.squad.printing.mssql.repo.PrintingDataSQL;
+import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,7 @@ public class ReaderConfig {
     }
 
     @Bean
-    public JdbcCursorItemReader<PrintingDataEntity> reader(DataSource dataSource) {
+    public JdbcCursorItemReader<PrintingDataEntity> pmpReader(DataSource dataSource) {
         JdbcCursorItemReader<PrintingDataEntity> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(printingDataSQL.getSQL(PrintingDataRepo.NameOfSQL.LIST_UNPROCESSED));

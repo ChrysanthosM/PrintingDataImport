@@ -1,8 +1,8 @@
 package org.masouras.app.batch.control;
 
-import org.masouras.printing.mssql.schema.jpa.control.ContentType;
-import org.masouras.printing.mssql.schema.jpa.entity.ActivityEntity;
-import org.masouras.printing.mssql.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
+import org.masouras.squad.printing.mssql.schema.jpa.entity.ActivityEntity;
+import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +16,7 @@ public class PrintingDataRowMapper implements RowMapper<PrintingDataEntity> {
 
         entity.setId(rs.getLong("id"));
         entity.setProcessed(rs.getBoolean("PROCESSED"));
-        entity.setCurrentTimestamp(rs.getTimestamp("CURRENT_TIMESTAMP").toLocalDateTime());
+        entity.setModifiedAt(rs.getTimestamp("MODIFIED_AT").toLocalDateTime());
 
         ActivityEntity activity = new ActivityEntity();
         activity.setId(rs.getLong("ACTIVITY_ID"));

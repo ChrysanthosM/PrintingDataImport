@@ -1,8 +1,8 @@
 package org.masouras.app.batch.config.pmp;
 
-import org.masouras.printing.mssql.repo.PrintingDataRepo;
-import org.masouras.printing.mssql.repo.PrintingDataSQL;
-import org.masouras.printing.mssql.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.squad.printing.mssql.repo.PrintingDataRepo;
+import org.masouras.squad.printing.mssql.repo.PrintingDataSQL;
+import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;

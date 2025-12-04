@@ -21,7 +21,7 @@ public class JobPMPConfig {
     }
 
     @Bean
-    public Job jobPMP(
+    public Job pmpJob(
             @Qualifier("pmpStep1") Step pmpStep1,
             @Qualifier("pmpStep2") Step pmpStep2,
             @Qualifier("pmpStep3") Step pmpStep3) {

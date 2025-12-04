@@ -1,7 +1,7 @@
 package org.masouras.app.batch.config.pmp;
 
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.printing.mssql.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
