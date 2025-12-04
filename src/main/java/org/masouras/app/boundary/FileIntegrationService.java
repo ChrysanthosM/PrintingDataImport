@@ -12,7 +12,7 @@ import org.masouras.data.domain.FileOkDto;
 import org.masouras.data.domain.FileOkRaw;
 import org.masouras.data.boundary.FileOnDBActions;
 import org.masouras.data.boundary.FileOnDiscActions;
-import org.masouras.printing.sqlite.schema.jpa.entity.ActivityEntity;
+import org.masouras.printing.mssql.schema.jpa.entity.ActivityEntity;
 import org.masouras.trace.annotation.Traceable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

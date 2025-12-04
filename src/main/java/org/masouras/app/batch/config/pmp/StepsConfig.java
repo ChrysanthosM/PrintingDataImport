@@ -1,7 +1,7 @@
 package org.masouras.app.batch.config.pmp;
 
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.printing.sqlite.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;

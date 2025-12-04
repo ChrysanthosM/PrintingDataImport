@@ -1,8 +1,8 @@
 package org.masouras.app.batch.control;
 
-import org.masouras.printing.sqlite.schema.jpa.control.ContentType;
-import org.masouras.printing.sqlite.schema.jpa.entity.ActivityEntity;
-import org.masouras.printing.sqlite.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.printing.mssql.schema.jpa.control.ContentType;
+import org.masouras.printing.mssql.schema.jpa.entity.ActivityEntity;
+import org.masouras.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
