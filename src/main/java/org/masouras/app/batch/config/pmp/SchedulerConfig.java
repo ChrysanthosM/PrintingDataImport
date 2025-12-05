@@ -9,6 +9,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,7 +25,8 @@ public class SchedulerConfig {
     private final Job job;
 
     @Autowired
-    public SchedulerConfig(JobLauncher jobLauncher, JobExplorer jobExplorer, Job job) {
+    public SchedulerConfig(JobLauncher jobLauncher, JobExplorer jobExplorer,
+                           @Qualifier("pmpJob") Job job) {
         this.jobLauncher = jobLauncher;
         this.jobExplorer = jobExplorer;
         this.job = job;

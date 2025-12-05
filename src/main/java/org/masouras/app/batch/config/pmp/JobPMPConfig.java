@@ -21,14 +21,15 @@ public class JobPMPConfig {
     }
 
     @Bean
-    public Job pmpJob(
-            @Qualifier("pmpStep1") Step pmpStep1,
-            @Qualifier("pmpStep2") Step pmpStep2,
-            @Qualifier("pmpStep3") Step pmpStep3) {
+    public Job pmpJob(@Qualifier("pmpStep1") Step pmpStep1,
+                      @Qualifier("pmpStep2") Step pmpStep2,
+                      @Qualifier("pmpStep3") Step pmpStep3) {
         return new JobBuilder(JOB_NAME, jobRepository)
                 .start(pmpStep1)
-                .next(pmpStep2)
+                .on("NOOP").end()
+                .from(pmpStep1).on("*").to(pmpStep2)
                 .next(pmpStep3)
+                .end()
                 .build();
     }
 }
