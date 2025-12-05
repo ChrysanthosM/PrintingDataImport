@@ -19,14 +19,14 @@ import java.util.Set;
 @Configuration
 @EnableScheduling
 @Slf4j
-public class SchedulerConfig {
+public class SchedulerPMPConfig {
     private final JobLauncher jobLauncher;
     private final JobExplorer jobExplorer;
     private final Job job;
 
     @Autowired
-    public SchedulerConfig(JobLauncher jobLauncher, JobExplorer jobExplorer,
-                           @Qualifier("pmpJob") Job job) {
+    public SchedulerPMPConfig(JobLauncher jobLauncher, JobExplorer jobExplorer,
+                              @Qualifier("pmpJob") Job job) {
         this.jobLauncher = jobLauncher;
         this.jobExplorer = jobExplorer;
         this.job = job;

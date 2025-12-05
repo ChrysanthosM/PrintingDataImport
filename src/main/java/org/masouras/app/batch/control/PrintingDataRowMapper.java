@@ -5,6 +5,7 @@ import org.masouras.squad.printing.mssql.schema.jpa.entity.ActivityEntity;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.masouras.squad.printing.mssql.schema.qb.structure.DbField;
 import org.springframework.jdbc.core.RowMapper;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;

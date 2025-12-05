@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 @Configuration
 @Slf4j
-public class ProcessorConfig {
+public class ProcessorPMPConfig {
 
     @Bean
     public CompositeItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor(

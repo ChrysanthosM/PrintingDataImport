@@ -21,14 +21,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @Slf4j
-public class StepsConfig {
+public class StepsPMPConfig {
     private static final int CHUNK_SIZE = 10;
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
 
     @Autowired
-    public StepsConfig(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public StepsPMPConfig(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
     }
