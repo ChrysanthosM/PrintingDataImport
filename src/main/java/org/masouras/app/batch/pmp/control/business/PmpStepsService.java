@@ -7,15 +7,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class PmpStepsService {
-    private final PmpMainStepService pmpMainStepService;
-    private final PmpReportStepService pmpReportStepService;
-    private final PmpNotifyStepService pmpNotifyStepService;
+    private final PmpStepReportService pmpStepReportService;
+    private final PmpStepNotificationService pmpStepNotificationService;
 
     @Autowired
-    public PmpStepsService(PmpMainStepService pmpMainStepService, PmpReportStepService pmpReportStepService, PmpNotifyStepService pmpNotifyStepService) {
-        this.pmpMainStepService = pmpMainStepService;
-        this.pmpReportStepService = pmpReportStepService;
-        this.pmpNotifyStepService = pmpNotifyStepService;
+    public PmpStepsService(PmpStepReportService pmpStepReportService, PmpStepNotificationService pmpStepNotificationService) {
+        this.pmpStepReportService = pmpStepReportService;
+        this.pmpStepNotificationService = pmpStepNotificationService;
     }
 
 

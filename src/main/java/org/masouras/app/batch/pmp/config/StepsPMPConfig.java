@@ -54,6 +54,7 @@ public class StepsPMPConfig {
                 .reader(pmpReader)
                 .processor(pmpProcessor)
                 .writer(pmpWriter)
+                .allowStartIfComplete(true)
                 .listener(new StepExecutionListener() {
                     @Override
                     public ExitStatus afterStep(@NotNull StepExecution stepExecution) {

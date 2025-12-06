@@ -5,6 +5,6 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class PmpNotifyStepService {
+public class PmpStepReportService {
 
 }
