@@ -22,7 +22,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
 @Configuration
-public class StepsPMPConfig {
+public class PmpStepsConfig {
     private static final int CHUNK_SIZE = 10;
 
     private final JobRepository jobRepository;
@@ -34,11 +34,12 @@ public class StepsPMPConfig {
     private final PmpStepsService pmpStepsService;
 
     @Autowired
-    public StepsPMPConfig(JobRepository jobRepository,
+    public PmpStepsConfig(JobRepository jobRepository,
                           PlatformTransactionManager transactionManager,
                           ItemReader<PrintingDataEntity> pmpReader,
                           @Qualifier("pmpMainCompositeItemProcessor") ItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor,
-                          ItemWriter<PrintingDataEntity> pmpWriter, PmpStepsService pmpStepsService) {
+                          ItemWriter<PrintingDataEntity> pmpWriter,
+                          PmpStepsService pmpStepsService) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.pmpReader = pmpReader;

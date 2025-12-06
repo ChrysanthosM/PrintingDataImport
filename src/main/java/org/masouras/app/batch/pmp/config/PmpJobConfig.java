@@ -10,13 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class JobPMPConfig {
+public class PmpJobConfig {
     public static final String JOB_NAME = "PMP_JOB";
 
     private final JobRepository jobRepository;
 
     @Autowired
-    public JobPMPConfig(JobRepository jobRepository) {
+    public PmpJobConfig(JobRepository jobRepository) {
         this.jobRepository = jobRepository;
     }
 

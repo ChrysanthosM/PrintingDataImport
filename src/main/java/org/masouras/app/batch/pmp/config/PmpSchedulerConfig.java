@@ -19,13 +19,13 @@ import java.util.Set;
 @Configuration
 @EnableScheduling
 @Slf4j
-public class SchedulerPMPConfig {
+public class PmpSchedulerConfig {
     private final JobLauncher jobLauncher;
     private final JobExplorer jobExplorer;
     private final Job job;
 
     @Autowired
-    public SchedulerPMPConfig(JobLauncher jobLauncher, JobExplorer jobExplorer,
+    public PmpSchedulerConfig(JobLauncher jobLauncher, JobExplorer jobExplorer,
                               @Qualifier("pmpJob") Job job) {
         this.jobLauncher = jobLauncher;
         this.jobExplorer = jobExplorer;
@@ -34,7 +34,7 @@ public class SchedulerPMPConfig {
 
     @Scheduled(fixedRate = 10000)
     public void runJob() throws Exception {
-        Set<JobExecution> runningJobs = jobExplorer.findRunningJobExecutions(JobPMPConfig.JOB_NAME);
+        Set<JobExecution> runningJobs = jobExplorer.findRunningJobExecutions(PmpJobConfig.JOB_NAME);
         if (CollectionUtils.isNotEmpty(runningJobs)) {
             if (log.isInfoEnabled()) log.info("Job is still running, skipping this cycle...");
             return;

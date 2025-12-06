@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 
 @Configuration
-public class WriterPMPConfig {
+public class PmpWriterConfig {
     private final PrintingDataSQL printingDataSQL;
 
     @Autowired
-    public WriterPMPConfig(PrintingDataSQL printingDataSQL) {
+    public PmpWriterConfig(PrintingDataSQL printingDataSQL) {
         this.printingDataSQL = printingDataSQL;
     }
 
