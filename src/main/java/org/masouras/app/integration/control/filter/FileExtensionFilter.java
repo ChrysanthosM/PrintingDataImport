@@ -1,4 +1,4 @@
-package org.masouras.app.control.filter;
+package org.masouras.app.integration.control.filter;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.integration.file.filters.FileListFilter;

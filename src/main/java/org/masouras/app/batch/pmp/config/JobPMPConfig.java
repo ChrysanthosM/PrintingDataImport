@@ -1,4 +1,4 @@
-package org.masouras.app.batch.config.pmp;
+package org.masouras.app.batch.pmp.config;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -25,8 +25,7 @@ public class JobPMPConfig {
                       @Qualifier("pmpStep2") Step pmpStep2,
                       @Qualifier("pmpStep3") Step pmpStep3) {
         return new JobBuilder(JOB_NAME, jobRepository)
-                .start(pmpStep1)
-                .on("NOOP").end()
+                .start(pmpStep1).on("NOOP").end()
                 .from(pmpStep1).on("*").to(pmpStep2)
                 .next(pmpStep3)
                 .end()

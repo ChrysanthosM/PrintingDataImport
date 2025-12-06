@@ -1,4 +1,4 @@
-package org.masouras.app.boundary;
+package org.masouras.app.integration.boundary;
 
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nullable;

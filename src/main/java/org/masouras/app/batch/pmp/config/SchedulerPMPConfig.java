@@ -1,4 +1,4 @@
-package org.masouras.app.batch.config.pmp;
+package org.masouras.app.batch.pmp.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;

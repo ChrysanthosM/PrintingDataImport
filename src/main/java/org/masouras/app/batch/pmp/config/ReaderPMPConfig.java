@@ -1,6 +1,6 @@
-package org.masouras.app.batch.config.pmp;
+package org.masouras.app.batch.pmp.config;
 
-import org.masouras.app.batch.control.PrintingDataRowMapper;
+import org.masouras.app.batch.pmp.control.mapper.PrintingDataRowMapper;
 import org.masouras.squad.printing.mssql.repo.PrintingDataRepo;
 import org.masouras.squad.printing.mssql.repo.PrintingDataSQL;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;

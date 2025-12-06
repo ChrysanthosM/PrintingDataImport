@@ -1,4 +1,4 @@
-package org.masouras.app.batch.config.pmp;
+package org.masouras.app.batch.pmp.config;
 
 import org.masouras.squad.printing.mssql.repo.PrintingDataRepo;
 import org.masouras.squad.printing.mssql.repo.PrintingDataSQL;

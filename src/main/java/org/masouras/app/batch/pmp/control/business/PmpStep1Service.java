@@ -1,4 +1,4 @@
-package org.masouras.app.batch.config.pmp;
+package org.masouras.app.batch.pmp.control.business;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -12,31 +12,35 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
 @Slf4j
-public class StepsPMPConfig {
+@Service
+public class PmpStep1Service {
     private static final int CHUNK_SIZE = 10;
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
+    private final ItemReader<PrintingDataEntity> pmpReader;
+    private final ItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor;
+    private final ItemWriter<PrintingDataEntity> pmpWriter;
 
-    @Autowired
-    public StepsPMPConfig(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public PmpStep1Service(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+                           ItemReader<PrintingDataEntity> pmpReader,
+                           @Qualifier("pmpProcessor") ItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor,
+                           ItemWriter<PrintingDataEntity> pmpWriter) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
+        this.pmpReader = pmpReader;
+        this.pmpProcessor = pmpProcessor;
+        this.pmpWriter = pmpWriter;
     }
 
     @Bean
-    public Step pmpStep1(ItemReader<PrintingDataEntity> pmpReader,
-                         @Qualifier("pmpProcessor") ItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor,
-                         ItemWriter<PrintingDataEntity> pmpWriter) {
+    public Step pmpStep1() {
         return new StepBuilder("pmpStep1", jobRepository)
                 .<PrintingDataEntity, PrintingDataEntity>chunk(CHUNK_SIZE, transactionManager)
                 .reader(pmpReader)
@@ -51,26 +55,6 @@ public class StepsPMPConfig {
                         return stepExecution.getExitStatus();
                     }
                 })
-                .build();
-    }
-
-    @Bean
-    public Step pmpStep2() {
-        return new StepBuilder("pmpStep2", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    if (log.isInfoEnabled()) log.info("Generating summary report...");
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
-                .build();
-    }
-
-    @Bean
-    public Step pmpStep3() {
-        return new StepBuilder("pmpStep3", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    if (log.isInfoEnabled()) log.info("Sending notification...");
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
                 .build();
     }
 }
