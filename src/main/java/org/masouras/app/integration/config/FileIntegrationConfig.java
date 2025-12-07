@@ -23,8 +23,8 @@ import java.util.List;
 @IntegrationComponentScan
 @Slf4j
 public class FileIntegrationConfig {
-    @Value("${watch.folder:null}") private String watchFolder;
-    @Value("${error.folder:null}") private String errorFolder;
+    @Value("${watch.folder:#{null}}") private String watchFolder;
+    @Value("${error.folder:#{null}}") private String errorFolder;
 
     private final FileIntegrationService fileIntegrationService;
 
