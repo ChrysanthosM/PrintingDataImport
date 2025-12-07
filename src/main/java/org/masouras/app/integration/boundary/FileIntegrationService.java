@@ -1,6 +1,8 @@
 package org.masouras.app.integration.boundary;
 
 import com.google.common.base.Preconditions;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,8 @@ public class FileIntegrationService {
     }
 
     @Traceable
+    @Timed("handle.and.persist.file")
+    @Counted("handle.and.persist.file")
     public boolean handleAndPersistFile(@NonNull File fileOk) {
         FileOkRaw fileOkRaw = getFileOkContent(fileOk);
         if (fileOkRaw == null) {
