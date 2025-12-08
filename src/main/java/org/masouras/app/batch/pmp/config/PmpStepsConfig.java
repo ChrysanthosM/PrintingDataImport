@@ -2,7 +2,7 @@ package org.masouras.app.batch.pmp.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.masouras.app.batch.pmp.control.business.PmpStepsService;
+import org.masouras.app.batch.pmp.control.business.boundary.PmpStepsService;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
@@ -73,7 +73,7 @@ public class PmpStepsConfig {
     public Step pmpNotifyStep() {
         return new StepBuilder("pmpNotifyStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    if (log.isInfoEnabled()) log.info("Sending notification...");
+                    pmpStepsService.processNotification();
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
                 .build();
@@ -83,7 +83,7 @@ public class PmpStepsConfig {
     public Step pmpReportStep() {
         return new StepBuilder("pmpReportStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    if (log.isInfoEnabled()) log.info("Generating summary report...");
+                    pmpStepsService.processReport();
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
                 .build();
