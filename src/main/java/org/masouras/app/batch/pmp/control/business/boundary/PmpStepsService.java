@@ -1,8 +1,8 @@
 package org.masouras.app.batch.pmp.control.business.boundary;
 
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.app.batch.pmp.control.business.control.PmpStepNotificationService;
-import org.masouras.app.batch.pmp.control.business.control.PmpStepReportService;
+import org.masouras.app.batch.pmp.control.business.control.step.PmpStepNotificationService;
+import org.masouras.app.batch.pmp.control.business.control.step.PmpStepReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

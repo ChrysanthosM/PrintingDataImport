@@ -1,8 +1,8 @@
 package org.masouras.app.batch.pmp.control.business.config;
 
-import org.masouras.app.batch.pmp.control.business.control.PmpMainProcessorFinalize;
-import org.masouras.app.batch.pmp.control.business.control.PmpMainProcessorParser;
-import org.masouras.app.batch.pmp.control.business.control.PmpMainProcessorValidation;
+import org.masouras.app.batch.pmp.control.business.control.step.PmpMainProcessorFinalize;
+import org.masouras.app.batch.pmp.control.business.control.step.PmpMainProcessorParser;
+import org.masouras.app.batch.pmp.control.business.control.step.PmpMainProcessorValidation;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.context.annotation.Bean;

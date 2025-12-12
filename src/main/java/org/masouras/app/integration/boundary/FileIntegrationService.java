@@ -1,13 +1,12 @@
 package org.masouras.app.integration.boundary;
 
-import com.google.common.base.Preconditions;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.masouras.data.boundary.FileOnDBActions;
 import org.masouras.data.boundary.FileOnDiscActions;
 import org.masouras.data.control.CsvParser;
@@ -85,7 +84,7 @@ public class FileIntegrationService {
         if (fileContentBase64 == null) return false;
 
         ActivityEntity activityEntity = fileOnDBActions.createActivity(fileOkDto.getActivityType());
-        Long insertedId = fileOnDBActions.savePrintingData(activityEntity, fileOkDto.getContentType(), fileContentBase64);
+        Long insertedId = fileOnDBActions.savePrintingData(activityEntity, fileOkDto.getContentType(), fileOkDto.getFileExtensionType(), fileContentBase64);
         if (log.isDebugEnabled()) log.debug("PrintingData Inserted with ID: {} and activity: {}", insertedId, activityEntity.getId());
 
         return true;
@@ -98,7 +97,7 @@ public class FileIntegrationService {
 
 
     public void handleErrorFile(@NonNull File fileOk, String errorFolder) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(errorFolder));
+        Validate.notBlank(errorFolder);
 
         fileOnDiscActions.copyFile(fileOk, errorFolder);
         List<String> possibleRelevantFileNames = fileOnDiscActions.getPossibleRelevantFileNames(fileOk);
