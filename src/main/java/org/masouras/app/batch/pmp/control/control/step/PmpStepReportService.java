@@ -1,11 +1,11 @@
-package org.masouras.app.batch.pmp.control.business.control.step;
+package org.masouras.app.batch.pmp.control.control.step;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class PmpStepNotificationService implements StepProcessor {
+public class PmpStepReportService implements StepProcessor {
 
     @Override
     public boolean process() {

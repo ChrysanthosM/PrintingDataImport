@@ -1,4 +1,4 @@
-package org.masouras.app.batch.pmp.control.mapper;
+package org.masouras.app.batch.pmp.control.control.mapper;
 
 import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.ActivityEntity;

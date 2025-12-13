@@ -1,11 +1,10 @@
-package org.masouras.app.batch.pmp.control.business.control.validator;
+package org.masouras.app.batch.pmp.control.control.validator.control;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.util.Chars;
-import org.jspecify.annotations.Nullable;
+import org.masouras.app.batch.pmp.control.control.validator.domain.FileValidatorResult;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -35,7 +34,7 @@ public class FileValidatorXML implements FileValidator {
     }
 
     @Override
-    public String validate(Object... params) {
+    public FileValidatorResult gatValidatedResult(Object... params) {
         Preconditions.checkNotNull(params);
         Preconditions.checkArgument(params.length >= 1, "validate requires 1 or 2 parameters: base64Content and optionally xsdPath");
 
@@ -44,16 +43,14 @@ public class FileValidatorXML implements FileValidator {
 
         String xsdPath = (params.length > 1) ? (String) params[1] : null;
 
-        return validateMain(base64Content, xsdPath);
+        return gatValidatedResultMain(base64Content, xsdPath);
     }
-    private @Nullable String validateMain(String base64Content, String xsdPath) {
+    private FileValidatorResult gatValidatedResultMain(String base64Content, String xsdPath) {
         try {
             String xmlContent = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
 
-            // Step 2: Sanitize XML (remove invalid chars + fix raw &)
             xmlContent = sanitizeXml(xmlContent);
 
-            // Step 3: Parse sanitized XML
             ByteArrayInputStream inputStream = new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8));
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             if (StringUtils.isNotBlank(xsdPath)) {
@@ -62,11 +59,10 @@ public class FileValidatorXML implements FileValidator {
             }
             Document doc = factory.newDocumentBuilder().parse(inputStream);
 
-            // If parsing succeeds, return null (no error)
-            return null;
+            return FileValidatorResult.success(doc);
         } catch (IllegalArgumentException | ParserConfigurationException | SAXException | IOException e) {
-            log.error("validateXmlBase64 failed with message: {}", e.getMessage(), e);
-            return e.getMessage();
+            log.error("{} failed with message: {}", this.getClass().getSimpleName(), e.getMessage(), e);
+            return FileValidatorResult.error(e.getMessage());
         }
     }
 

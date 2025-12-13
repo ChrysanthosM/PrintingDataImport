@@ -2,7 +2,7 @@ package org.masouras.app.batch.pmp.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.masouras.app.batch.pmp.control.business.boundary.PmpStepsService;
+import org.masouras.app.batch.pmp.control.boundary.PmpStepsService;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
