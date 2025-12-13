@@ -7,8 +7,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
-import org.masouras.data.boundary.FileOnDBActions;
-import org.masouras.data.boundary.FileOnDiscActions;
+import org.masouras.data.boundary.FilesFacade;
+import org.masouras.data.boundary.RepositoryFacade;
 import org.masouras.data.control.CsvParser;
 import org.masouras.data.control.FileOkAdapter;
 import org.masouras.data.domain.FileOkDto;
@@ -25,12 +25,12 @@ import java.util.List;
 @Service
 @Slf4j
 public class FileIntegrationService {
-    private final FileOnDiscActions fileOnDiscActions;
-    private final FileOnDBActions fileOnDBActions;
+    private final FilesFacade fileOnDiscActions;
+    private final RepositoryFacade fileOnDBActions;
 
     @Autowired
-    public FileIntegrationService(FileOnDiscActions fileOnDiscActions, FileOnDBActions fileOnDBActions) {
-        this.fileOnDiscActions = fileOnDiscActions;
+    public FileIntegrationService(FilesFacade filesFacade, RepositoryFacade fileOnDBActions) {
+        this.fileOnDiscActions = filesFacade;
         this.fileOnDBActions = fileOnDBActions;
     }
 

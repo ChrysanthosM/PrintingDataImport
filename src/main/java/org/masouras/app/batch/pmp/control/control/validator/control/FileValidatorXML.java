@@ -67,15 +67,12 @@ public class FileValidatorXML implements FileValidator {
     }
 
     private String sanitizeXml(String input) {
-        // Step 1: filter invalid XML chars and replace them with space
         String cleaned = input.chars()
                 .mapToObj(c -> {
                     char ch = (char) c;
                     return isValidXmlChar(ch) ? String.valueOf(ch) : StringUtils.SPACE;
                 })
                 .collect(Collectors.joining());
-
-        // Step 2: fix raw ampersands not part of valid entities
         return cleaned.replaceAll("&(?!amp;|lt;|gt;|quot;|apos;)", "&amp;");
     }
     private boolean isValidXmlChar(char ch) {
