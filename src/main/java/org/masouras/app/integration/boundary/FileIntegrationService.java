@@ -13,6 +13,9 @@ import org.masouras.data.control.CsvParser;
 import org.masouras.data.control.FileOkAdapter;
 import org.masouras.data.domain.FileOkDto;
 import org.masouras.data.domain.FileOkRaw;
+import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
+import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
+import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.ActivityEntity;
 import org.masouras.trace.annotation.Traceable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,14 +70,28 @@ public class FileIntegrationService {
             if (log.isWarnEnabled()) log.warn("fileExtensionType not found inside file '{}'", fileOk.getName());
             return null;
         }
+        if (FileExtensionType.getFromCode(fileOkDto.getFileExtensionType().getCode()) == null) {
+            if (log.isWarnEnabled()) log.warn("fileExtensionType {} not found inside FileExtensionType '{}'", fileOkDto.getFileExtensionType().getCode(), fileOk.getName());
+            return null;
+        }
+
         if (fileOkDto.getActivityType() == null) {
             if (log.isWarnEnabled()) log.warn("activityType not found inside file '{}'", fileOk.getName());
             return null;
         }
+        if (ActivityType.getFromCode(fileOkDto.getActivityType().getCode()) == null) {
+            if (log.isWarnEnabled()) log.warn("activityType {} not found inside ActivityType '{}'", fileOkDto.getActivityType().getCode(), fileOk.getName());
+            return null;
+        }
+
         if (fileOkDto.getContentType() == null) {
             if (log.isWarnEnabled()) log.warn("contentType not found inside file '{}'", fileOk.getName());
             return null;
         }
+        if (ContentType.getFromCode(fileOkDto.getContentType().getCode()) == null) {
+            if (log.isWarnEnabled()) log.warn("contentType {} not found inside ContentType '{}'", fileOkDto.getContentType().getCode(), fileOk.getName());
+        }
+
         return fileOkDto;
     }
 

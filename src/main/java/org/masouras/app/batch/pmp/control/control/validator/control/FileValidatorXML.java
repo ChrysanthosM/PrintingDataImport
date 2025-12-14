@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Chars;
+import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.control.control.validator.domain.FileValidatorResult;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class FileValidatorXML implements FileValidator {
     }
 
     @Override
-    public FileValidatorResult gatValidatedResult(Object... params) {
+    public FileValidatorResult getValidatedResult(Object... params) {
         Preconditions.checkNotNull(params);
         Preconditions.checkArgument(params.length >= 1, "validate requires 1 or 2 parameters: base64Content and optionally xsdPath");
 
@@ -47,11 +48,7 @@ public class FileValidatorXML implements FileValidator {
     }
     private FileValidatorResult gatValidatedResultMain(String base64Content, String xsdPath) {
         try {
-            String xmlContent = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
-
-            xmlContent = sanitizeXml(xmlContent);
-
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8));
+            ByteArrayInputStream inputStream = getByteArrayInputStream(base64Content);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             if (StringUtils.isNotBlank(xsdPath)) {
                 SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -65,6 +62,10 @@ public class FileValidatorXML implements FileValidator {
             return FileValidatorResult.error(e.getMessage());
         }
     }
+    private @NonNull ByteArrayInputStream getByteArrayInputStream(String base64Content) {
+        String xmlContent = removeBom(sanitizeXml(new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8)));
+        return new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8));
+    }
 
     private String sanitizeXml(String input) {
         String cleaned = input.chars()
@@ -74,6 +75,12 @@ public class FileValidatorXML implements FileValidator {
                 })
                 .collect(Collectors.joining());
         return cleaned.replaceAll("&(?!amp;|lt;|gt;|quot;|apos;)", "&amp;");
+    }
+    private String removeBom(String input) {
+        if (StringUtils.isNotBlank(input) && input.startsWith("\uFEFF")) {
+            input = input.substring(1);
+        }
+        return StringUtils.trimToEmpty(input);
     }
     private boolean isValidXmlChar(char ch) {
         return (ch == Chars.TAB     // tab

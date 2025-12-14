@@ -7,7 +7,6 @@ import org.masouras.app.batch.pmp.control.control.validator.control.FileValidato
 import org.masouras.app.batch.pmp.control.control.validator.domain.FileValidatorResult;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;
-import org.masouras.squad.printing.mssql.schema.jpa.control.PrintingStatus;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
@@ -40,7 +39,7 @@ public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEnt
                 .filter(fv -> fv.getFileExtensionType().getCode().equals(printingDataEntity.getFileExtensionType().getCode()))
                 .findFirst()
                 .orElseThrow(() -> new ValidationException("Validation failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().getCode()))
-                .gatValidatedResult(printingDataEntity.getContentBase64());
+                .getValidatedResult(printingDataEntity.getContentBase64());
         if (fileValidatorResult.getValidationStatus() == FileValidatorResult.ValidationStatus.ERROR) throw new ValidationException("Validation failed with message: " + fileValidatorResult.getValidationMessage());
 
         return saveContentValidated(printingDataEntity, fileValidatorResult);

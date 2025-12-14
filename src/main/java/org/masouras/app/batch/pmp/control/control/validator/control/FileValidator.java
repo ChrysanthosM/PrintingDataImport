@@ -5,5 +5,5 @@ import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 
 public interface FileValidator {
     FileExtensionType getFileExtensionType();
-    FileValidatorResult gatValidatedResult(Object... params);
+    FileValidatorResult getValidatedResult(Object... params);
 }
