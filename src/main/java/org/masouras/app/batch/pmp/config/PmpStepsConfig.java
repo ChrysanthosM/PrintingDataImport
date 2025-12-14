@@ -2,17 +2,17 @@ package org.masouras.app.batch.pmp.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.control.boundary.PmpStepsService;
+import org.masouras.data.boundary.RepositoryFacade;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,6 +32,7 @@ public class PmpStepsConfig {
     private final ItemWriter<PrintingDataEntity> pmpWriter;
 
     private final PmpStepsService pmpStepsService;
+    private final RepositoryFacade repositoryFacade;
 
     @Autowired
     public PmpStepsConfig(JobRepository jobRepository,
@@ -39,13 +40,14 @@ public class PmpStepsConfig {
                           ItemReader<PrintingDataEntity> pmpReader,
                           @Qualifier("pmpMainCompositeItemProcessor") ItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor,
                           ItemWriter<PrintingDataEntity> pmpWriter,
-                          PmpStepsService pmpStepsService) {
+                          PmpStepsService pmpStepsService, RepositoryFacade repositoryFacade) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.pmpReader = pmpReader;
         this.pmpProcessor = pmpProcessor;
         this.pmpWriter = pmpWriter;
         this.pmpStepsService = pmpStepsService;
+        this.repositoryFacade = repositoryFacade;
     }
 
     @Bean("pmpMainStep")
@@ -55,6 +57,18 @@ public class PmpStepsConfig {
                 .reader(pmpReader)
                 .processor(pmpProcessor)
                 .writer(pmpWriter)
+
+                .faultTolerant()
+                .skip(ValidationException.class)
+                .skipLimit(Integer.MAX_VALUE)
+                .listener(new SkipListener<>() {
+                    @Override
+                    public void onSkipInProcess(@NonNull PrintingDataEntity printingDataEntity, @NonNull Throwable throwable) {
+                        if (log.isWarnEnabled()) log.warn("Skipped item id {} due to {}", printingDataEntity.getId(), throwable.getMessage());
+                        repositoryFacade.saveValidationFailed(printingDataEntity, throwable.getMessage());
+                    }
+                })
+
                 .allowStartIfComplete(true)
                 .listener(new StepExecutionListener() {
                     @Override

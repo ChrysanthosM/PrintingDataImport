@@ -25,13 +25,13 @@ import java.util.List;
 @Service
 @Slf4j
 public class FileIntegrationService {
-    private final FilesFacade fileOnDiscActions;
-    private final RepositoryFacade fileOnDBActions;
+    private final FilesFacade filesFacade;
+    private final RepositoryFacade repositoryFacade;
 
     @Autowired
-    public FileIntegrationService(FilesFacade filesFacade, RepositoryFacade fileOnDBActions) {
-        this.fileOnDiscActions = filesFacade;
-        this.fileOnDBActions = fileOnDBActions;
+    public FileIntegrationService(FilesFacade filesFacade, RepositoryFacade repositoryFacade) {
+        this.filesFacade = filesFacade;
+        this.repositoryFacade = repositoryFacade;
     }
 
     @Traceable
@@ -46,7 +46,7 @@ public class FileIntegrationService {
         FileOkDto fileOkDto = getFileOkDto(fileOkRaw, fileOk);
         if (fileOkDto == null) return false;
 
-        File relevantFile = fileOnDiscActions.getRelevantFile(fileOk, fileOkDto);
+        File relevantFile = filesFacade.getRelevantFile(fileOk, fileOkDto);
         if (!relevantFile.exists() || !relevantFile.isFile()) {
             if (log.isWarnEnabled()) log.warn("Expected Relevant file '{}' not found for OK file '{}'", relevantFile.getName(), fileOk.getName());
             return false;
@@ -57,7 +57,7 @@ public class FileIntegrationService {
             return false;
         }
 
-        fileOnDiscActions.deleteFile(relevantFile);
+        filesFacade.deleteFile(relevantFile);
         if (log.isDebugEnabled()) log.debug("Relevant file persisted '{}'", fileOk.getName());
         return true;
     }
@@ -80,18 +80,18 @@ public class FileIntegrationService {
 
     @Transactional
     private boolean handleAndPersistFileMain(FileOkDto fileOkDto, File relevantFile) {
-        String fileContentBase64 = fileOnDiscActions.getContentBase64(relevantFile);
+        String fileContentBase64 = filesFacade.getContentBase64(relevantFile);
         if (fileContentBase64 == null) return false;
 
-        ActivityEntity activityEntity = fileOnDBActions.createActivity(fileOkDto.getActivityType());
-        Long insertedId = fileOnDBActions.savePrintingData(activityEntity, fileOkDto.getContentType(), fileOkDto.getFileExtensionType(), fileContentBase64);
+        ActivityEntity activityEntity = repositoryFacade.createActivity(fileOkDto.getActivityType());
+        Long insertedId = repositoryFacade.savePrintingData(activityEntity, fileOkDto.getContentType(), fileOkDto.getFileExtensionType(), fileContentBase64);
         if (log.isDebugEnabled()) log.debug("PrintingData Inserted with ID: {} and activity: {}", insertedId, activityEntity.getId());
 
         return true;
     }
 
     public @Nullable FileOkRaw getFileOkContent(@NonNull File fileOk) {
-        List<FileOkRaw> fileOkRawList = fileOnDiscActions.getCsvContent(FileOkRaw.class, CsvParser.DelimiterType.PIPE, fileOk);
+        List<FileOkRaw> fileOkRawList = filesFacade.getCsvContent(FileOkRaw.class, CsvParser.DelimiterType.PIPE, fileOk);
         return CollectionUtils.isEmpty(fileOkRawList) ? null : fileOkRawList.getFirst();
     }
 
@@ -99,13 +99,13 @@ public class FileIntegrationService {
     public void handleErrorFile(@NonNull File fileOk, String errorFolder) {
         Validate.notBlank(errorFolder);
 
-        fileOnDiscActions.copyFile(fileOk, errorFolder);
-        List<String> possibleRelevantFileNames = fileOnDiscActions.getPossibleRelevantFileNames(fileOk);
+        filesFacade.copyFile(fileOk, errorFolder);
+        List<String> possibleRelevantFileNames = filesFacade.getPossibleRelevantFileNames(fileOk);
         if (CollectionUtils.isEmpty(possibleRelevantFileNames)) return;
         possibleRelevantFileNames.stream()
                 .map(File::new)
                 .filter(file -> file.exists() && file.isFile())
-                .forEach(file -> fileOnDiscActions.moveFile(file, errorFolder));
+                .forEach(file -> filesFacade.moveFile(file, errorFolder));
 
 
     }

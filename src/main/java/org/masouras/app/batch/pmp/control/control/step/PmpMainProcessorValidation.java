@@ -7,12 +7,12 @@ import org.masouras.app.batch.pmp.control.control.validator.control.FileValidato
 import org.masouras.app.batch.pmp.control.control.validator.domain.FileValidatorResult;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;
+import org.masouras.squad.printing.mssql.schema.jpa.control.PrintingStatus;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.TransformerException;
@@ -22,13 +22,13 @@ import java.util.List;
 @Service
 public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEntity, PrintingDataEntity> {
     private final List<FileValidator> fileValidators;
-    private final FilesFacade fileOnDiscActions;
+    private final FilesFacade filesFacade;
     private final RepositoryFacade repositoryFacade;
 
     @Autowired
     public PmpMainProcessorValidation(List<FileValidator> fileValidators, FilesFacade filesFacade, RepositoryFacade repositoryFacade) {
         this.fileValidators = fileValidators;
-        this.fileOnDiscActions = filesFacade;
+        this.filesFacade = filesFacade;
         this.repositoryFacade = repositoryFacade;
     }
 
@@ -46,13 +46,10 @@ public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEnt
         return saveContentValidated(printingDataEntity, fileValidatorResult);
     }
 
-    @Transactional
     private PrintingDataEntity saveContentValidated(@NonNull PrintingDataEntity printingDataEntity, FileValidatorResult fileValidatorResult) {
         try {
-            String stringDocument = fileOnDiscActions.documentToString((Document) fileValidatorResult.getValidationResult());
-            printingDataEntity.setContentBase64(fileOnDiscActions.stringDocumentToBase64(stringDocument));
-            printingDataEntity.setContentValidated(true);
-            return repositoryFacade.saveContentValidated(printingDataEntity);
+            String stringDocument = filesFacade.documentToString((Document) fileValidatorResult.getValidationResult());
+            return repositoryFacade.saveContentValidated(printingDataEntity, filesFacade.stringDocumentToBase64(stringDocument));
         } catch (TransformerException e) {
             log.error("{} failed with message: {}", this.getClass().getSimpleName(), e.getMessage(), e);
             throw new ValidationException("Validation failed with message: " + e.getMessage(), e);
