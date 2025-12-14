@@ -1,10 +1,10 @@
-package org.masouras.app.batch.pmp.control.control.step;
+package org.masouras.app.batch.pmp.boundary.step;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import org.masouras.app.batch.pmp.control.control.validator.control.FileValidator;
-import org.masouras.app.batch.pmp.control.control.validator.domain.FileValidatorResult;
+import org.masouras.app.batch.pmp.control.FileValidator;
+import org.masouras.app.batch.pmp.domain.FileValidatorResult;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
@@ -40,14 +40,14 @@ public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEnt
                 .findFirst()
                 .orElseThrow(() -> new ValidationException("Validation failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().getCode()))
                 .getValidatedResult(printingDataEntity.getContentBase64());
-        if (fileValidatorResult.getValidationStatus() == FileValidatorResult.ValidationStatus.ERROR) throw new ValidationException("Validation failed with message: " + fileValidatorResult.getValidationMessage());
+        if (fileValidatorResult.getStatus() == FileValidatorResult.ValidationStatus.ERROR) throw new ValidationException("Validation failed with message: " + fileValidatorResult.getMessage());
 
         return saveContentValidated(printingDataEntity, fileValidatorResult);
     }
 
     private PrintingDataEntity saveContentValidated(@NonNull PrintingDataEntity printingDataEntity, FileValidatorResult fileValidatorResult) {
         try {
-            String stringDocument = filesFacade.documentToString((Document) fileValidatorResult.getValidationResult());
+            String stringDocument = filesFacade.documentToString((Document) fileValidatorResult.getResult());
             return repositoryFacade.saveContentValidated(printingDataEntity, filesFacade.stringDocumentToBase64(stringDocument));
         } catch (TransformerException e) {
             log.error("{} failed with message: {}", this.getClass().getSimpleName(), e.getMessage(), e);

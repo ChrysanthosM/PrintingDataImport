@@ -1,11 +1,11 @@
-package org.masouras.app.batch.pmp.control.control.validator.control;
+package org.masouras.app.batch.pmp.control;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Chars;
 import org.jspecify.annotations.NonNull;
-import org.masouras.app.batch.pmp.control.control.validator.domain.FileValidatorResult;
+import org.masouras.app.batch.pmp.domain.FileValidatorResult;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;

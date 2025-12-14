@@ -1,4 +1,4 @@
-package org.masouras.app.batch.pmp.control.control.step;
+package org.masouras.app.batch.pmp.boundary.step;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;

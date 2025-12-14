@@ -1,5 +1,8 @@
-package org.masouras.app.batch.pmp.control.control.step;
+package org.masouras.app.batch.pmp.boundary;
 
+import org.masouras.app.batch.pmp.boundary.step.PmpMainProcessorFinalize;
+import org.masouras.app.batch.pmp.boundary.step.PmpMainProcessorParser;
+import org.masouras.app.batch.pmp.boundary.step.PmpMainProcessorValidation;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.context.annotation.Bean;
