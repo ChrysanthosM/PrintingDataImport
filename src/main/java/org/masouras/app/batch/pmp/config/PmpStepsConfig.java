@@ -65,7 +65,7 @@ public class PmpStepsConfig {
                     @Override
                     public void onSkipInProcess(@NonNull PrintingDataEntity printingDataEntity, @NonNull Throwable throwable) {
                         if (log.isWarnEnabled()) log.warn("Skipped item id {} due to {}", printingDataEntity.getId(), throwable.getMessage());
-                        repositoryFacade.saveValidationFailed(printingDataEntity, throwable.getMessage());
+                        repositoryFacade.saveStepFailed(printingDataEntity, throwable.getMessage());
                     }
                 })
 
