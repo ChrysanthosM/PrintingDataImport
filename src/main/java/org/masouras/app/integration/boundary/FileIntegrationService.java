@@ -16,11 +16,9 @@ import org.masouras.data.domain.FileOkRaw;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
-import org.masouras.squad.printing.mssql.schema.jpa.entity.ActivityEntity;
 import org.masouras.trace.annotation.Traceable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.List;
@@ -95,14 +93,12 @@ public class FileIntegrationService {
         return fileOkDto;
     }
 
-    @Transactional
     private boolean handleAndPersistFileMain(FileOkDto fileOkDto, File relevantFile) {
         String fileContentBase64 = filesFacade.getContentBase64(relevantFile);
         if (fileContentBase64 == null) return false;
 
-        ActivityEntity activityEntity = repositoryFacade.createActivity(fileOkDto.getActivityType());
-        Long insertedId = repositoryFacade.savePrintingData(activityEntity, fileOkDto.getContentType(), fileOkDto.getFileExtensionType(), fileContentBase64);
-        if (log.isDebugEnabled()) log.debug("PrintingData Inserted with ID: {} and activity: {}", insertedId, activityEntity.getId());
+        Long insertedId = repositoryFacade.saveInitialPrintingData(fileOkDto, fileContentBase64);
+        if (log.isDebugEnabled()) log.debug("PrintingData Inserted with ID: {}", insertedId);
 
         return true;
     }

@@ -39,7 +39,7 @@ public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEnt
                 .filter(fv -> fv.getFileExtensionType().getCode().equals(printingDataEntity.getFileExtensionType().getCode()))
                 .findFirst()
                 .orElseThrow(() -> new ValidationException("Validation failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().getCode()))
-                .getValidatedResult(printingDataEntity.getContentBase64());
+                .getValidatedResult(printingDataEntity.getInitialContent().getContentBase64());
         if (fileValidatorResult.getStatus() == FileValidatorResult.ValidationStatus.ERROR) throw new ValidationException("Validation failed with message: " + fileValidatorResult.getMessage());
 
         return saveContentValidated(printingDataEntity, fileValidatorResult);
