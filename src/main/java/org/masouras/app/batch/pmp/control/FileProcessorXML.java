@@ -2,11 +2,16 @@ package org.masouras.app.batch.pmp.control;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.domain.FileProcessorResult;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.springframework.stereotype.Service;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Service
 @Slf4j
@@ -32,7 +37,12 @@ public class FileProcessorXML implements FileProcessor {
         return getFileProcessorResultMain(activityType, contentType, validatedBase64Content);
     }
     private FileProcessorResult getFileProcessorResultMain(ActivityType activityType, ContentType contentType, String validatedBase64Content) {
+        ByteArrayInputStream xmlStream = getByteArrayInputStream(validatedBase64Content);
 
         return FileProcessorResult.success("");
+    }
+    private @NonNull ByteArrayInputStream getByteArrayInputStream(String validatedBase64Content) {
+        String xmlContent = new String(Base64.getDecoder().decode(validatedBase64Content), StandardCharsets.UTF_8);
+        return new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8));
     }
 }

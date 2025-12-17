@@ -48,7 +48,7 @@ public class PmpMainProcessorParser implements ItemProcessor<PrintingDataEntity,
     private PrintingDataEntity saveContentParsed(@NonNull PrintingDataEntity printingDataEntity, FileProcessorResult fileProcessorResult) {
         try {
             String stringDocument = filesFacade.documentToString((Document) fileProcessorResult.getResult());
-            return repositoryFacade.saveContentValidated(printingDataEntity, filesFacade.stringDocumentToBase64(stringDocument));
+            return repositoryFacade.saveContentParsed(printingDataEntity, filesFacade.stringDocumentToBase64(stringDocument));
         } catch (TransformerException e) {
             log.error("{} failed with message: {}", this.getClass().getSimpleName(), e.getMessage(), e);
             throw new ValidationException("Parser failed with message: " + e.getMessage(), e);
