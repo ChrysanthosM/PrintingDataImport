@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.control.FileProcessor;
 import org.masouras.app.batch.pmp.domain.FileProcessorResult;
-import org.masouras.app.batch.pmp.domain.FileValidatorResult;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
