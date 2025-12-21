@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.domain.FileProcessorResult;
+import org.masouras.data.control.render.PdfRendererService;
+import org.masouras.data.control.render.PdfRendererType;
 import org.masouras.data.control.service.PrintingLetterSetUpService;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
@@ -24,6 +26,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FileProcessorXML implements FileProcessor {
     private final PrintingLetterSetUpService printingLetterSetUpService;
+    private final PdfRendererService pdfRendererService;
 
     @Override
     public FileExtensionType getFileExtensionType() {
@@ -50,6 +53,7 @@ public class FileProcessorXML implements FileProcessor {
                 .getOrDefault(contentType.getCode(), List.of());
         if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found");
 
+//        pdfRendererService.generatePdf(PdfRendererType.FOP, ,).generate();
         ByteArrayInputStream xmlStream = getByteArrayInputStream(validatedBase64Content);
         implementorList.forEach(implementor -> {
 
