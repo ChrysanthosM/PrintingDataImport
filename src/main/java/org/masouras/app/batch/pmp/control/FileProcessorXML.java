@@ -1,21 +1,28 @@
 package org.masouras.app.batch.pmp.control;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.domain.FileProcessorResult;
+import org.masouras.data.control.service.PrintingLetterSetUpService;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
+import org.masouras.squad.printing.mssql.schema.jpa.projection.PrintingLetterSetUpProjectionImplementor;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FileProcessorXML implements FileProcessor {
+    private final PrintingLetterSetUpService printingLetterSetUpService;
 
     @Override
     public FileExtensionType getFileExtensionType() {
@@ -37,6 +44,14 @@ public class FileProcessorXML implements FileProcessor {
         return getFileProcessorResultMain(activityType, contentType, validatedBase64Content);
     }
     private FileProcessorResult getFileProcessorResultMain(ActivityType activityType, ContentType contentType, String validatedBase64Content) {
+        List<PrintingLetterSetUpProjectionImplementor> implementorList = printingLetterSetUpService.getPrintingLetterSetUpProjectionImplementors()
+                .stream()
+                .filter(row ->
+                        row.getActivityType().getCode().equals(activityType.getCode())
+                        && row.getContentType().getCode().equals(contentType.getCode()))
+                .toList();
+        if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found");
+
         ByteArrayInputStream xmlStream = getByteArrayInputStream(validatedBase64Content);
 
         return FileProcessorResult.success("");

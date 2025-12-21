@@ -1,9 +1,9 @@
 package org.masouras.app.integration.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.app.integration.boundary.FileIntegrationService;
 import org.masouras.app.integration.control.filter.FileExtensionFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,16 +22,12 @@ import java.util.List;
 @EnableIntegration
 @IntegrationComponentScan
 @Slf4j
+@RequiredArgsConstructor
 public class FileIntegrationConfig {
     @Value("${watch.folder:#{null}}") private String watchFolder;
     @Value("${error.folder:#{null}}") private String errorFolder;
 
     private final FileIntegrationService fileIntegrationService;
-
-    @Autowired
-    public FileIntegrationConfig(FileIntegrationService fileIntegrationService) {
-        this.fileIntegrationService = fileIntegrationService;
-    }
 
     @Bean
     public IntegrationFlow okPollingFlow(FileExtensionFilter fileExtensionFilter) {

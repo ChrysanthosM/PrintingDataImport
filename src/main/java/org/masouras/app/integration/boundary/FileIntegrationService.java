@@ -4,20 +4,20 @@ import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.Nullable;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;
-import org.masouras.data.control.CsvParser;
-import org.masouras.data.control.FileOkAdapter;
+import org.masouras.data.control.converter.CsvParser;
+import org.masouras.data.control.converter.FileOkAdapter;
 import org.masouras.data.domain.FileOkDto;
 import org.masouras.data.domain.FileOkRaw;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.masouras.trace.annotation.Traceable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -25,15 +25,10 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FileIntegrationService {
     private final FilesFacade filesFacade;
     private final RepositoryFacade repositoryFacade;
-
-    @Autowired
-    public FileIntegrationService(FilesFacade filesFacade, RepositoryFacade repositoryFacade) {
-        this.filesFacade = filesFacade;
-        this.repositoryFacade = repositoryFacade;
-    }
 
     @Traceable
     @Timed("handle.and.persist.file")

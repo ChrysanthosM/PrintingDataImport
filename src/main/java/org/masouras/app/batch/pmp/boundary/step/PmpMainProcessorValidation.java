@@ -1,5 +1,6 @@
 package org.masouras.app.batch.pmp.boundary.step;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -10,7 +11,6 @@ import org.masouras.data.boundary.RepositoryFacade;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
@@ -19,17 +19,11 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEntity, PrintingDataEntity> {
     private final List<FileValidator> fileValidators;
     private final FilesFacade filesFacade;
     private final RepositoryFacade repositoryFacade;
-
-    @Autowired
-    public PmpMainProcessorValidation(List<FileValidator> fileValidators, FilesFacade filesFacade, RepositoryFacade repositoryFacade) {
-        this.fileValidators = fileValidators;
-        this.filesFacade = filesFacade;
-        this.repositoryFacade = repositoryFacade;
-    }
 
     @Override
     public PrintingDataEntity process(@NotNull PrintingDataEntity printingDataEntity) {

@@ -1,24 +1,20 @@
 package org.masouras.app.batch.pmp.config;
 
+import lombok.RequiredArgsConstructor;
 import org.masouras.squad.printing.mssql.repo.PrintingDataRepo;
 import org.masouras.squad.printing.mssql.repo.PrintingDataSQL;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 
 @Configuration
+@RequiredArgsConstructor
 public class PmpWriterConfig {
     private final PrintingDataSQL printingDataSQL;
-
-    @Autowired
-    public PmpWriterConfig(PrintingDataSQL printingDataSQL) {
-        this.printingDataSQL = printingDataSQL;
-    }
 
     @Bean
     public ItemWriter<PrintingDataEntity> pmpWriter(DataSource dataSource) {
