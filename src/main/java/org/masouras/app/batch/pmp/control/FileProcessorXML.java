@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -44,15 +45,15 @@ public class FileProcessorXML implements FileProcessor {
         return getFileProcessorResultMain(activityType, contentType, validatedBase64Content);
     }
     private FileProcessorResult getFileProcessorResultMain(ActivityType activityType, ContentType contentType, String validatedBase64Content) {
-        List<PrintingLetterSetUpProjectionImplementor> implementorList = printingLetterSetUpService.getPrintingLetterSetUpProjectionImplementors()
-                .stream()
-                .filter(row ->
-                        row.getActivityType().getCode().equals(activityType.getCode())
-                        && row.getContentType().getCode().equals(contentType.getCode()))
-                .toList();
+        List<PrintingLetterSetUpProjectionImplementor> implementorList = printingLetterSetUpService.getPrintingLetterLookUpMap()
+                .getOrDefault(activityType.getCode(), Map.of())
+                .getOrDefault(contentType.getCode(), List.of());
         if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found");
 
         ByteArrayInputStream xmlStream = getByteArrayInputStream(validatedBase64Content);
+        implementorList.forEach(implementor -> {
+
+        });
 
         return FileProcessorResult.success("");
     }
