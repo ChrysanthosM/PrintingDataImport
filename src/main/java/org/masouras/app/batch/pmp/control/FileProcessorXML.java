@@ -4,11 +4,13 @@ import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.domain.FileProcessorResult;
 import org.masouras.data.control.render.PdfRendererService;
-import org.masouras.data.control.render.PdfRendererType;
+import org.masouras.squad.printing.mssql.schema.jpa.control.RendererType;
 import org.masouras.data.control.service.PrintingLetterSetUpService;
+import org.masouras.data.control.service.XslTemplateService;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
 import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +30,7 @@ import java.util.Map;
 public class FileProcessorXML implements FileProcessor {
     private final PrintingLetterSetUpService printingLetterSetUpService;
     private final PdfRendererService pdfRendererService;
+    private final XslTemplateService xslTemplateService;
 
     @Override
     public FileExtensionType getFileExtensionType() {
@@ -53,13 +57,19 @@ public class FileProcessorXML implements FileProcessor {
                 .getOrDefault(contentType.getCode(), List.of());
         if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found");
 
-//        pdfRendererService.generatePdf(PdfRendererType.FOP, ,).generate();
-        ByteArrayInputStream xmlStream = getByteArrayInputStream(validatedBase64Content);
-        implementorList.forEach(implementor -> {
+        List<String> pdfResultList = implementorList.stream()
+                .map(implementor -> new AbstractMap.SimpleEntry<>(implementor, xslTemplateService.getTemplate(implementor.getXslType())))
+                .filter(entry -> ArrayUtils.isNotEmpty(entry.getValue()))
+                .map(entry -> Base64.getEncoder().encodeToString(
+                        pdfRendererService.generatePdf(
+                                entry.getKey().getRendererType(),
+                                Base64.getDecoder().decode(validatedBase64Content),
+                                entry.getValue()
+                        )
+                ))
+                .toList();
 
-        });
-
-        return FileProcessorResult.success("");
+        return FileProcessorResult.success(pdfResultList);
     }
     private @NonNull ByteArrayInputStream getByteArrayInputStream(String validatedBase64Content) {
         String xmlContent = new String(Base64.getDecoder().decode(validatedBase64Content), StandardCharsets.UTF_8);
