@@ -1,10 +1,10 @@
 package org.masouras.app.batch.pmp.config;
 
 import lombok.RequiredArgsConstructor;
-import org.masouras.squad.printing.mssql.schema.jpa.mapper.PrintingDataRowMapper;
 import org.masouras.squad.printing.mssql.repo.PrintingDataRepo;
 import org.masouras.squad.printing.mssql.repo.PrintingDataSQL;
 import org.masouras.squad.printing.mssql.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.squad.printing.mssql.schema.jpa.mapper.PrintingDataRowMapper;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.context.annotation.Bean;
