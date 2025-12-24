@@ -17,8 +17,6 @@ import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
 import org.masouras.squad.printing.mssql.schema.jpa.projection.PrintingLetterSetUpProjectionImplementor;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Base64;
 import java.util.List;
@@ -71,9 +69,5 @@ public class FileProcessorXML implements FileProcessor {
                 .toList();
 
         return FileProcessorResult.success(pdfResultList);
-    }
-    private @NonNull ByteArrayInputStream getByteArrayInputStream(String validatedBase64Content) {
-        String xmlContent = new String(Base64.getDecoder().decode(validatedBase64Content), StandardCharsets.UTF_8);
-        return new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8));
     }
 }
