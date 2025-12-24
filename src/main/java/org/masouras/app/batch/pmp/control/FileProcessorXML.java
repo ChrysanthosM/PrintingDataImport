@@ -57,13 +57,14 @@ public class FileProcessorXML implements FileProcessor {
                 .getOrDefault(contentType.getCode(), List.of());
         if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found");
 
-        List<String> pdfResultList = implementorList.stream()
+        final byte[] base64ContentDecoded = Base64.getDecoder().decode(validatedBase64Content);
+        List<String> pdfResultList = implementorList.parallelStream()
                 .map(implementor -> new AbstractMap.SimpleEntry<>(implementor, xslTemplateService.getTemplate(implementor.getXslType())))
                 .filter(entry -> ArrayUtils.isNotEmpty(entry.getValue()))
                 .map(entry -> Base64.getEncoder().encodeToString(
                         pdfRendererService.generatePdf(
                                 entry.getKey().getRendererType(),
-                                Base64.getDecoder().decode(validatedBase64Content),
+                                base64ContentDecoded,
                                 entry.getValue()
                         )
                 ))
