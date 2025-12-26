@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableMongoRepositories
 @EnableScheduling
-public class ApplicationRun {
+public class PrintingDataImportRun {
     public static void main(String[] args) {
-        SpringApplication.run(ApplicationRun.class, args);
+        SpringApplication.run(PrintingDataImportRun.class, args);
     }
 }
