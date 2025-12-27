@@ -1,8 +1,8 @@
 package org.masouras.app.batch.pmp.config;
 
 import lombok.RequiredArgsConstructor;
-import org.masouras.model.mssql.repo.PrintingDataRepo;
-import org.masouras.model.mssql.repo.PrintingDataSQL;
+import org.masouras.model.mssql.j2sql.PrintingDataRepo;
+import org.masouras.model.mssql.j2sql.PrintingDataSQL;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
