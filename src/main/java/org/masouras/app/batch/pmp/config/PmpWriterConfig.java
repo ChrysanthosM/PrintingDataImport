@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.masouras.model.mssql.j2sql.PrintingDataRepo;
 import org.masouras.model.mssql.j2sql.PrintingDataSQL;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

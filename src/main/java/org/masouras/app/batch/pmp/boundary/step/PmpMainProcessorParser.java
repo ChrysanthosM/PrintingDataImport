@@ -9,8 +9,8 @@ import org.masouras.app.batch.pmp.domain.FileProcessorResult;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.validator.ValidationException;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.validator.ValidationException;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 

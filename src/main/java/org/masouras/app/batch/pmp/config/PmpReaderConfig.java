@@ -6,7 +6,7 @@ import org.masouras.model.mssql.j2sql.PrintingDataSQL;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
 import org.masouras.model.mssql.schema.jpa.control.entity.adapter.mapper.PrintingDataRowMapper;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.infrastructure.item.database.JdbcCursorItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,11 +20,9 @@ public class PmpReaderConfig {
     @Bean
     @StepScope
     public JdbcCursorItemReader<PrintingDataEntity> pmpReader(DataSource dataSource) {
-        JdbcCursorItemReader<PrintingDataEntity> reader = new JdbcCursorItemReader<>();
-        reader.setDataSource(dataSource);
-        reader.setSql(printingDataSQL.getSQL(PrintingDataRepo.NameOfSQL.LIST_UNPROCESSED));
-        reader.setRowMapper(new PrintingDataRowMapper());
-        return reader;
+        return new JdbcCursorItemReader<>(dataSource,
+                printingDataSQL.getSQL(PrintingDataRepo.NameOfSQL.LIST_UNPROCESSED),
+                new PrintingDataRowMapper());
     }
 }
 
