@@ -9,10 +9,10 @@ import org.masouras.app.batch.pmp.domain.FileProcessorResult;
 import org.masouras.data.control.render.PdfRendererService;
 import org.masouras.data.control.service.PrintingLetterSetUpService;
 import org.masouras.data.control.service.XslTemplateService;
-import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
-import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
-import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
-import org.masouras.squad.printing.mssql.schema.jpa.projection.PrintingLetterSetUpProjectionImplementor;
+import org.masouras.model.mssql.schema.jpa.control.ActivityType;
+import org.masouras.model.mssql.schema.jpa.control.ContentType;
+import org.masouras.model.mssql.schema.jpa.control.FileExtensionType;
+import org.masouras.model.mssql.schema.jpa.projection.PrintingLetterSetUpProjectionImplementor;
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
@@ -51,7 +51,7 @@ public class FileProcessorXML implements FileProcessor {
         List<PrintingLetterSetUpProjectionImplementor> implementorList = printingLetterSetUpService.getPrintingLetterLookUpMap()
                 .getOrDefault(activityType.getCode(), Map.of())
                 .getOrDefault(contentType.getCode(), List.of());
-        if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found");
+        if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found for ActivityType: " + activityType + " and ContentType: " + contentType);
 
         final byte[] base64ContentDecoded = Base64.getDecoder().decode(validatedBase64Content);
         List<String> pdfResultList = implementorList.parallelStream()

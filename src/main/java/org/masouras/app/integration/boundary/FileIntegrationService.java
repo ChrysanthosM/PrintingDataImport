@@ -14,9 +14,9 @@ import org.masouras.data.control.converter.CsvParser;
 import org.masouras.data.control.converter.FileOkAdapter;
 import org.masouras.data.domain.FileOkDto;
 import org.masouras.data.domain.FileOkRaw;
-import org.masouras.squad.printing.mssql.schema.jpa.control.ActivityType;
-import org.masouras.squad.printing.mssql.schema.jpa.control.ContentType;
-import org.masouras.squad.printing.mssql.schema.jpa.control.FileExtensionType;
+import org.masouras.model.mssql.schema.jpa.control.ActivityType;
+import org.masouras.model.mssql.schema.jpa.control.ContentType;
+import org.masouras.model.mssql.schema.jpa.control.FileExtensionType;
 import org.masouras.trace.annotation.Traceable;
 import org.springframework.stereotype.Service;
 
