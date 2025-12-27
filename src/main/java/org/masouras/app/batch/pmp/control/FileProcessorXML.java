@@ -9,10 +9,10 @@ import org.masouras.app.batch.pmp.domain.FileProcessorResult;
 import org.masouras.data.control.render.PdfRendererService;
 import org.masouras.data.control.service.PrintingLetterSetUpService;
 import org.masouras.data.control.service.XslTemplateService;
-import org.masouras.model.mssql.schema.jpa.control.ActivityType;
-import org.masouras.model.mssql.schema.jpa.control.ContentType;
-import org.masouras.model.mssql.schema.jpa.control.FileExtensionType;
-import org.masouras.model.mssql.schema.jpa.projection.PrintingLetterSetUpProjectionImplementor;
+import org.masouras.model.mssql.schema.jpa.control.entity.adapter.projection.PrintingLetterSetUpProjectionImplementor;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;

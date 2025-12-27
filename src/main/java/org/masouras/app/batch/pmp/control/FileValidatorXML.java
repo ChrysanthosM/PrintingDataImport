@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Chars;
 import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.domain.FileValidatorResult;
-import org.masouras.model.mssql.schema.jpa.control.FileExtensionType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;

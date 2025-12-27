@@ -2,8 +2,8 @@ package org.masouras.app.batch.pmp.boundary.step;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.masouras.model.mssql.schema.jpa.control.PrintingStatus;
-import org.masouras.model.mssql.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingStatus;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Service;
 

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.boundary.PmpStepsService;
 import org.masouras.data.boundary.RepositoryFacade;
-import org.masouras.model.mssql.schema.jpa.entity.PrintingDataEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
