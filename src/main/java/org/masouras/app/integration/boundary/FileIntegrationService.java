@@ -17,6 +17,7 @@ import org.masouras.data.domain.FileOkRaw;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
+import org.masouras.model.mssql.schema.jpa.control.util.EnumUtil;
 import org.masouras.trace.annotation.Traceable;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +64,7 @@ public class FileIntegrationService {
             if (log.isWarnEnabled()) log.warn("fileExtensionType not found inside file '{}'", fileOk.getName());
             return null;
         }
-        if (FileExtensionType.getFromCode(fileOkDto.getFileExtensionType().getCode()) == null) {
+        if (EnumUtil.fromCode(FileExtensionType.class, fileOkDto.getFileExtensionType().getCode()) == null) {
             if (log.isWarnEnabled()) log.warn("fileExtensionType {} not found inside FileExtensionType '{}'", fileOkDto.getFileExtensionType().getCode(), fileOk.getName());
             return null;
         }
@@ -72,7 +73,7 @@ public class FileIntegrationService {
             if (log.isWarnEnabled()) log.warn("activityType not found inside file '{}'", fileOk.getName());
             return null;
         }
-        if (ActivityType.getFromCode(fileOkDto.getActivityType().getCode()) == null) {
+        if (EnumUtil.fromCode(ActivityType.class, fileOkDto.getActivityType().getCode()) == null) {
             if (log.isWarnEnabled()) log.warn("activityType {} not found inside ActivityType '{}'", fileOkDto.getActivityType().getCode(), fileOk.getName());
             return null;
         }
@@ -81,7 +82,7 @@ public class FileIntegrationService {
             if (log.isWarnEnabled()) log.warn("contentType not found inside file '{}'", fileOk.getName());
             return null;
         }
-        if (ContentType.getFromCode(fileOkDto.getContentType().getCode()) == null) {
+        if (EnumUtil.fromCode(ContentType.class, fileOkDto.getContentType().getCode()) == null) {
             if (log.isWarnEnabled()) log.warn("contentType {} not found inside ContentType '{}'", fileOkDto.getContentType().getCode(), fileOk.getName());
         }
 
