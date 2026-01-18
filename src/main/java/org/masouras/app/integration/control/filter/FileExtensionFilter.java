@@ -1,6 +1,7 @@
 package org.masouras.app.integration.control.filter;
 
 import org.apache.commons.io.FilenameUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.integration.file.filters.FileListFilter;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ public class FileExtensionFilter implements FileListFilter<File> {
     private final Set<String> ALLOWED_EXTENSIONS = Set.of("ok");
 
     @Override
-    public List<File> filterFiles(File[] files) {
+    public @NonNull List<File> filterFiles(File[] files) {
         return Arrays.stream(files)
                 .filter(this::accept)
                 .collect(Collectors.toList());
