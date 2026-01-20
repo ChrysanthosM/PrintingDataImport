@@ -32,7 +32,7 @@ public class PmpMainProcessorParser implements ItemProcessor<PrintingDataEntity,
         FileProcessorResult fileProcessorResult = fileProcessors.stream()
                 .filter(fv -> fv.getFileExtensionType().getCode().equals(printingDataEntity.getFileExtensionType().getCode()))
                 .findFirst()
-                .orElseThrow(() -> new ValidationException("Parser failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().getCode()))
+                .orElseThrow(() -> new ValidationException("Parser failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().name()))
                 .getFileProcessorResult(printingDataEntity.getActivity().getActivityType(), printingDataEntity.getContentType(), printingDataEntity.getValidatedContent().getContentBase64());
         if (fileProcessorResult.getStatus() == FileProcessorResult.ProcessorStatus.ERROR) throw new ValidationException("Parser failed with message: " + fileProcessorResult.getMessage());
 
