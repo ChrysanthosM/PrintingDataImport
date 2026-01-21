@@ -13,6 +13,7 @@ import org.masouras.model.mssql.schema.jpa.control.entity.adapter.projection.Pri
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.ValidFlag;
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
@@ -55,6 +56,7 @@ public class FileProcessorXML implements FileProcessor {
 
         final byte[] base64ContentDecoded = Base64.getDecoder().decode(validatedBase64Content);
         List<String> pdfResultList = implementorList.parallelStream()
+                .filter(implementor -> implementor.getValidFlag() != ValidFlag.DISABLED)
                 .map(implementor -> new AbstractMap.SimpleEntry<>(implementor, xslTemplateService.getTemplate(implementor.getXslType())))
                 .filter(entry -> ArrayUtils.isNotEmpty(entry.getValue()))
                 .map(entry -> Base64.getEncoder().encodeToString(

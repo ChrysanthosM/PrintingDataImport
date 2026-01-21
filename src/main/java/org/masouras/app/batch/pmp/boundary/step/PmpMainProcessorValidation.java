@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.masouras.app.batch.pmp.control.FileValidator;
+import org.masouras.app.batch.pmp.control.FileValidatorFactory;
 import org.masouras.app.batch.pmp.domain.FileValidatorResult;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;
@@ -15,13 +16,12 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.TransformerException;
-import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEntity, PrintingDataEntity> {
-    private final List<FileValidator> fileValidators;
+    private final FileValidatorFactory fileValidatorFactory;
     private final FilesFacade filesFacade;
     private final RepositoryFacade repositoryFacade;
 
@@ -29,11 +29,9 @@ public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEnt
     public PrintingDataEntity process(@NotNull PrintingDataEntity printingDataEntity) {
         if (log.isInfoEnabled()) log.info("{}: Validating printingDataEntity {}", this.getClass().getSimpleName(), printingDataEntity.getId());
 
-        FileValidatorResult fileValidatorResult = fileValidators.stream()
-                .filter(fv -> fv.getFileExtensionType().getCode().equals(printingDataEntity.getFileExtensionType().getCode()))
-                .findFirst()
-                .orElseThrow(() -> new ValidationException("Validation failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().name()))
-                .getValidatedResult(printingDataEntity.getInitialContent().getContentBase64());
+        FileValidator fileValidator = fileValidatorFactory.getFileValidator(printingDataEntity.getFileExtensionType().getCode());
+        if (fileValidator == null) throw new ValidationException("Validation failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().getCode());
+        FileValidatorResult fileValidatorResult = fileValidator.getValidatedResult(printingDataEntity.getInitialContent().getContentBase64());
         if (fileValidatorResult.getStatus() == FileValidatorResult.ValidationStatus.ERROR) throw new ValidationException("Validation failed with message: " + fileValidatorResult.getMessage());
 
         return saveContentValidated(printingDataEntity, fileValidatorResult);
