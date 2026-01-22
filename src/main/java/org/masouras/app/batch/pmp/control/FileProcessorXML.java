@@ -56,7 +56,7 @@ public class FileProcessorXML implements FileProcessor {
 
         final byte[] base64ContentDecoded = Base64.getDecoder().decode(validatedBase64Content);
         List<String> pdfResultList = implementorList.parallelStream()
-                .filter(implementor -> implementor.getValidFlag() != ValidFlag.DISABLED)
+                .filter(implementor -> implementor.getValidFlag() == ValidFlag.ENABLED)
                 .map(implementor -> new AbstractMap.SimpleEntry<>(implementor, xslTemplateService.getTemplate(implementor.getXslType())))
                 .filter(entry -> ArrayUtils.isNotEmpty(entry.getValue()))
                 .map(entry -> Base64.getEncoder().encodeToString(
