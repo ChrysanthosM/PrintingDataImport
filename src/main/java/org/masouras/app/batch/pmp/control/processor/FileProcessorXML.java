@@ -1,4 +1,4 @@
-package org.masouras.app.batch.pmp.control;
+package org.masouras.app.batch.pmp.control.processor;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;

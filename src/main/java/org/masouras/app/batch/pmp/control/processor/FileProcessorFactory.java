@@ -1,4 +1,4 @@
-package org.masouras.app.batch.pmp.control;
+package org.masouras.app.batch.pmp.control.processor;
 
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;

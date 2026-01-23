@@ -1,4 +1,4 @@
-package org.masouras.app.batch.pmp.control;
+package org.masouras.app.batch.pmp.control.processor;
 
 import org.masouras.app.batch.pmp.domain.FileProcessorResult;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;

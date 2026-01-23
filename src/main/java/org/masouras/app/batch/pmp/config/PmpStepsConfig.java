@@ -3,10 +3,9 @@ package org.masouras.app.batch.pmp.config;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.app.batch.pmp.boundary.PmpStepsService;
-import org.masouras.data.boundary.RepositoryFacade;
+import org.masouras.app.batch.pmp.control.listener.*;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.listener.SkipListener;
 import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
@@ -34,7 +33,11 @@ public class PmpStepsConfig {
     private final ItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor;
     private final ItemWriter<PrintingDataEntity> pmpWriter;
     private final PmpStepsService pmpStepsService;
-    private final RepositoryFacade repositoryFacade;
+    private final PmpMainStepSkipPolicy pmpMainStepSkipPolicy;
+    private final PmpProcessListener pmpProcessListener;
+    private final PmpSkipListener pmpSkipListener;
+    private final PmpItemProcessListener pmpItemProcessListener;
+    private final PmpStepExecutionListener pmpStepExecutionListener;
 
     public PmpStepsConfig(JobRepository jobRepository,
                           PlatformTransactionManager transactionManager,
@@ -43,21 +46,24 @@ public class PmpStepsConfig {
                           ItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor,
                           ItemWriter<PrintingDataEntity> pmpWriter,
                           PmpStepsService pmpStepsService,
-                          RepositoryFacade repositoryFacade) {
-
+                          PmpMainStepSkipPolicy pmpMainStepSkipPolicy,
+                          PmpProcessListener pmpProcessListener,
+                          PmpSkipListener pmpSkipListener,
+                          PmpItemProcessListener pmpItemProcessListener,
+                          PmpStepExecutionListener pmpStepExecutionListener) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.pmpReader = pmpReader;
         this.pmpProcessor = pmpProcessor;
         this.pmpWriter = pmpWriter;
         this.pmpStepsService = pmpStepsService;
-        this.repositoryFacade = repositoryFacade;
+        this.pmpMainStepSkipPolicy = pmpMainStepSkipPolicy;
+        this.pmpProcessListener = pmpProcessListener;
+        this.pmpSkipListener = pmpSkipListener;
+        this.pmpItemProcessListener = pmpItemProcessListener;
+        this.pmpStepExecutionListener = pmpStepExecutionListener;
     }
 
-    @Bean
-    public SkipPolicy pmpMainStepSkipPolicy() {
-        return (throwable, skipCount) -> throwable instanceof ValidationException;
-    }
 
     @Bean("pmpMainStep")
     public Step pmpMainStep() {
@@ -70,27 +76,14 @@ public class PmpStepsConfig {
                 .writer(pmpWriter)
 
                 .faultTolerant()
-                .skipPolicy(pmpMainStepSkipPolicy())
+                .skipPolicy(pmpMainStepSkipPolicy)
                 .skipLimit(Integer.MAX_VALUE)
-                .listener(new SkipListener<PrintingDataEntity, PrintingDataEntity>() {
-                    @Override
-                    public void onSkipInProcess(PrintingDataEntity item, @NonNull Throwable throwable) {
-                        log.warn("Skipped item id {} due to {}", item.getId(), throwable.getMessage());
-                        repositoryFacade.saveStepFailed(item, throwable.getMessage());
-                    }
-                })
+                .listener(pmpSkipListener)
+                .listener(pmpProcessListener)
                 .allowStartIfComplete(true)
 
-                .listener(new StepExecutionListener() {
-                    @Override
-                    public ExitStatus afterStep(@NonNull StepExecution stepExecution) {
-                        if (stepExecution.getWriteCount() == 0) {
-                            log.info("pmpMainStep ExitStatus NOOP");
-                            return new ExitStatus("NOOP");
-                        }
-                        return stepExecution.getExitStatus();
-                    }
-                })
+                .listener(pmpItemProcessListener)
+                .listener(pmpStepExecutionListener)
                 .build();
     }
 
