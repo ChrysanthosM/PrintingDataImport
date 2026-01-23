@@ -1,5 +1,6 @@
 package org.masouras.app.batch.pmp.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.app.batch.pmp.boundary.PmpStepsService;
 import org.masouras.app.batch.pmp.control.PmpMainStepCompositeItemProcessor;
@@ -18,6 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class PmpStepsConfig {
     private static final int CHUNK_SIZE = 10;
 
@@ -32,30 +34,6 @@ public class PmpStepsConfig {
     private final PmpSkipListener pmpSkipListener;
     private final PmpItemProcessListener pmpItemProcessListener;
     private final PmpStepExecutionListener pmpStepExecutionListener;
-
-    public PmpStepsConfig(JobRepository jobRepository,
-                          PlatformTransactionManager transactionManager,
-                          ItemReader<PrintingDataEntity> pmpReader,
-                          PmpMainStepCompositeItemProcessor pmpProcessor,
-                          ItemWriter<PrintingDataEntity> pmpWriter,
-                          PmpStepsService pmpStepsService,
-                          PmpMainStepSkipPolicy pmpMainStepSkipPolicy,
-                          PmpProcessListener pmpProcessListener,
-                          PmpSkipListener pmpSkipListener,
-                          PmpItemProcessListener pmpItemProcessListener,
-                          PmpStepExecutionListener pmpStepExecutionListener) {
-        this.jobRepository = jobRepository;
-        this.transactionManager = transactionManager;
-        this.pmpReader = pmpReader;
-        this.pmpProcessor = pmpProcessor;
-        this.pmpWriter = pmpWriter;
-        this.pmpStepsService = pmpStepsService;
-        this.pmpMainStepSkipPolicy = pmpMainStepSkipPolicy;
-        this.pmpProcessListener = pmpProcessListener;
-        this.pmpSkipListener = pmpSkipListener;
-        this.pmpItemProcessListener = pmpItemProcessListener;
-        this.pmpStepExecutionListener = pmpStepExecutionListener;
-    }
 
 
     @Bean("pmpMainStep")
