@@ -1,23 +1,17 @@
 package org.masouras.app.batch.pmp.config;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.app.batch.pmp.boundary.PmpStepsService;
+import org.masouras.app.batch.pmp.control.PmpMainStepCompositeItemProcessor;
+import org.masouras.app.batch.pmp.control.PmpMainStepSkipPolicy;
 import org.masouras.app.batch.pmp.control.listener.*;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.listener.StepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
-import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.core.step.skip.SkipPolicy;
-import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.ItemReader;
 import org.springframework.batch.infrastructure.item.ItemWriter;
-import org.springframework.batch.infrastructure.item.validator.ValidationException;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -30,7 +24,7 @@ public class PmpStepsConfig {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final ItemReader<PrintingDataEntity> pmpReader;
-    private final ItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor;
+    private final PmpMainStepCompositeItemProcessor pmpProcessor;
     private final ItemWriter<PrintingDataEntity> pmpWriter;
     private final PmpStepsService pmpStepsService;
     private final PmpMainStepSkipPolicy pmpMainStepSkipPolicy;
@@ -42,8 +36,7 @@ public class PmpStepsConfig {
     public PmpStepsConfig(JobRepository jobRepository,
                           PlatformTransactionManager transactionManager,
                           ItemReader<PrintingDataEntity> pmpReader,
-                          @Qualifier("pmpMainCompositeItemProcessor")
-                          ItemProcessor<PrintingDataEntity, PrintingDataEntity> pmpProcessor,
+                          PmpMainStepCompositeItemProcessor pmpProcessor,
                           ItemWriter<PrintingDataEntity> pmpWriter,
                           PmpStepsService pmpStepsService,
                           PmpMainStepSkipPolicy pmpMainStepSkipPolicy,
@@ -78,10 +71,10 @@ public class PmpStepsConfig {
                 .faultTolerant()
                 .skipPolicy(pmpMainStepSkipPolicy)
                 .skipLimit(Integer.MAX_VALUE)
-                .listener(pmpSkipListener)
-                .listener(pmpProcessListener)
+                .skipListener(pmpSkipListener)
                 .allowStartIfComplete(true)
 
+                .listener(pmpProcessListener)
                 .listener(pmpItemProcessListener)
                 .listener(pmpStepExecutionListener)
                 .build();
