@@ -1,6 +1,7 @@
 package org.masouras.app.batch.pmp.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
@@ -20,7 +21,7 @@ public class PmpJobConfig {
     public Job pmpJob(@Qualifier("pmpMainStep") Step pmpMainStep,
                       @Qualifier("pmpReportStep") Step pmpReportStep) {
         return new JobBuilder(JOB_NAME, jobRepository)
-                .start(pmpMainStep).on("NOOP").end()
+                .start(pmpMainStep).on(ExitStatus.NOOP.getExitCode()).end()
                 .from(pmpMainStep).on("*").to(pmpReportStep)
                 .end()
                 .build();

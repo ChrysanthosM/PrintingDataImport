@@ -22,7 +22,7 @@ public class PmpReportStepConfig {
     @Bean
     public Step pmpReportStep() {
         return new StepBuilder("pmpReportStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
+                .tasklet((_, _) -> {
                     pmpReportProcessor.process();
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
