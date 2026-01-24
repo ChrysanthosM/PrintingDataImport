@@ -1,11 +1,11 @@
-package org.masouras.app.batch.pmp.boundary.step;
+package org.masouras.app.batch.pmp.control.step.business.processor;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import org.masouras.app.batch.pmp.control.processor.FileValidator;
-import org.masouras.app.batch.pmp.control.processor.FileValidatorFactory;
+import org.masouras.app.batch.pmp.control.step.business.parser.FileValidator;
+import org.masouras.app.batch.pmp.control.step.business.parser.FileValidatorFactory;
 import org.masouras.app.batch.pmp.domain.FileValidatorResult;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;

@@ -18,12 +18,10 @@ public class PmpJobConfig {
 
     @Bean
     public Job pmpJob(@Qualifier("pmpMainStep") Step pmpMainStep,
-                      @Qualifier("pmpReportStep") Step pmpReportStep,
-                      @Qualifier("pmpNotifyStep") Step pmpNotifyStep) {
+                      @Qualifier("pmpReportStep") Step pmpReportStep) {
         return new JobBuilder(JOB_NAME, jobRepository)
                 .start(pmpMainStep).on("NOOP").end()
                 .from(pmpMainStep).on("*").to(pmpReportStep)
-                .next(pmpNotifyStep)
                 .end()
                 .build();
     }

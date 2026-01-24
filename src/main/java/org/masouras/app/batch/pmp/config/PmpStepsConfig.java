@@ -2,10 +2,13 @@ package org.masouras.app.batch.pmp.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.masouras.app.batch.pmp.boundary.PmpStepsService;
-import org.masouras.app.batch.pmp.control.PmpMainStepCompositeItemProcessor;
-import org.masouras.app.batch.pmp.control.PmpMainStepSkipPolicy;
-import org.masouras.app.batch.pmp.control.listener.*;
+import org.masouras.app.batch.pmp.control.step.business.processor.PmpMainStepCompositeItemProcessor;
+import org.masouras.app.batch.pmp.control.step.business.processor.PmpReportProcessor;
+import org.masouras.app.batch.pmp.control.step.cycle.PmpMainStepSkipPolicy;
+import org.masouras.app.batch.pmp.control.step.cycle.listener.PmpItemProcessListener;
+import org.masouras.app.batch.pmp.control.step.cycle.listener.PmpProcessListener;
+import org.masouras.app.batch.pmp.control.step.cycle.listener.PmpSkipListener;
+import org.masouras.app.batch.pmp.control.step.cycle.listener.PmpStepExecutionListener;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
@@ -28,7 +31,7 @@ public class PmpStepsConfig {
     private final ItemReader<PrintingDataEntity> pmpReader;
     private final PmpMainStepCompositeItemProcessor pmpProcessor;
     private final ItemWriter<PrintingDataEntity> pmpWriter;
-    private final PmpStepsService pmpStepsService;
+    private final PmpReportProcessor pmpReportProcessor;
     private final PmpMainStepSkipPolicy pmpMainStepSkipPolicy;
     private final PmpProcessListener pmpProcessListener;
     private final PmpSkipListener pmpSkipListener;
@@ -58,18 +61,6 @@ public class PmpStepsConfig {
                 .build();
     }
 
-    // -------------------------------
-    // NOTIFY STEP (Tasklet)
-    // -------------------------------
-    @Bean("pmpNotifyStep")
-    public Step pmpNotifyStep() {
-        return new StepBuilder("pmpNotifyStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    pmpStepsService.processNotification();
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
-                .build();
-    }
 
     // -------------------------------
     // REPORT STEP (Tasklet)
@@ -78,7 +69,7 @@ public class PmpStepsConfig {
     public Step pmpReportStep() {
         return new StepBuilder("pmpReportStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
-                    pmpStepsService.processReport();
+                    pmpReportProcessor.process();
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
                 .build();
