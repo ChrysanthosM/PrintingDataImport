@@ -14,6 +14,8 @@ import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.batch.infrastructure.item.validator.ValidationException;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,13 +30,13 @@ public class PmpMainProcessorParser implements ItemProcessor<PrintingDataEntity,
 
         FileProcessor fileProcessor = fileProcessorFactory.getFileProcessor(printingDataEntity.getFileExtensionType().name());
         if (fileProcessor == null) { throw new ValidationException("Parser failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().name()); }
-        FileProcessorResult fileProcessorResult = fileProcessor.getFileProcessorResult(printingDataEntity.getActivity().getActivityType(), printingDataEntity.getContentType(), printingDataEntity.getValidatedContent().getContentBase64());
+        FileProcessorResult fileProcessorResult = fileProcessor.getFileProcessorResult(printingDataEntity.getActivity().getActivityType(), printingDataEntity.getContentType(), printingDataEntity.getValidatedContent().getContentBinary());
         if (fileProcessorResult.getStatus() == FileProcessorResult.ProcessorStatus.ERROR) throw new ValidationException("Parser failed with message: " + fileProcessorResult.getMessage());
 
         return saveContentParsed(printingDataEntity, fileProcessorResult);
     }
     private PrintingDataEntity saveContentParsed(@NonNull PrintingDataEntity printingDataEntity, FileProcessorResult fileProcessorResult) {
-        return repositoryFacade.saveContentParsed(printingDataEntity, filesFacade.objectToBase64(fileProcessorResult.getResult()));
+        return repositoryFacade.saveContentParsed(printingDataEntity, filesFacade.objectToBase64(fileProcessorResult.getResult()).getBytes(StandardCharsets.UTF_8));
     }
 }
 

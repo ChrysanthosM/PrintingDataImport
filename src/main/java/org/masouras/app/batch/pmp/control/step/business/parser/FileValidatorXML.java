@@ -2,6 +2,7 @@ package org.masouras.app.batch.pmp.control.step.business.parser;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Chars;
 import org.jspecify.annotations.NonNull;
@@ -37,18 +38,20 @@ public class FileValidatorXML implements FileValidator {
     @Override
     public FileValidatorResult getValidatedResult(Object... params) {
         Preconditions.checkNotNull(params);
-        Preconditions.checkArgument(params.length >= 1, "validate requires 1 or 2 parameters: base64Content and optionally xsdPath");
+        Preconditions.checkArgument(params.length >= 1, "validate requires 1 or 2 parameters: fileContent and optionally xsdPath");
 
-        String base64Content = (String) params[0];
-        Preconditions.checkNotNull(base64Content, "base64Content can't be null");
+        byte[] fileContent = (byte[]) params[0];
+        if (ArrayUtils.isEmpty(fileContent)) {
+            throw new IllegalArgumentException("fileContent can't be empty");
+        }
 
         String xsdPath = (params.length > 1) ? (String) params[1] : null;
 
-        return gatValidatedResultMain(base64Content, xsdPath);
+        return gatValidatedResultMain(fileContent, xsdPath);
     }
-    private FileValidatorResult gatValidatedResultMain(String base64Content, String xsdPath) {
+    private FileValidatorResult gatValidatedResultMain(byte[] fileContent, String xsdPath) {
         try {
-            ByteArrayInputStream inputStream = getByteArrayInputStream(base64Content);
+            ByteArrayInputStream inputStream = getByteArrayInputStream(fileContent);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             if (StringUtils.isNotBlank(xsdPath)) {
                 SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -62,8 +65,8 @@ public class FileValidatorXML implements FileValidator {
             return FileValidatorResult.error(e.getMessage());
         }
     }
-    private @NonNull ByteArrayInputStream getByteArrayInputStream(String base64Content) {
-        String xmlContent = removeBom(sanitizeXml(new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8)));
+    private @NonNull ByteArrayInputStream getByteArrayInputStream(byte[] fileContent) {
+        String xmlContent = removeBom(sanitizeXml(new String(fileContent, StandardCharsets.UTF_8)));
         return new ByteArrayInputStream(xmlContent.getBytes(StandardCharsets.UTF_8));
     }
 

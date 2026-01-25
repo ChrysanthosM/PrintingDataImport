@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.TransformerException;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
@@ -31,7 +32,7 @@ public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEnt
 
         FileValidator fileValidator = fileValidatorFactory.getFileValidator(printingDataEntity.getFileExtensionType().name());
         if (fileValidator == null) throw new ValidationException("Validation failed, FileExtensionType not found: " + printingDataEntity.getFileExtensionType().name());
-        FileValidatorResult fileValidatorResult = fileValidator.getValidatedResult(printingDataEntity.getInitialContent().getContentBase64());
+        FileValidatorResult fileValidatorResult = fileValidator.getValidatedResult((Object) printingDataEntity.getInitialContent().getContentBinary());
         if (fileValidatorResult.getStatus() == FileValidatorResult.ValidationStatus.ERROR) throw new ValidationException("Validation failed with message: " + fileValidatorResult.getMessage());
 
         return saveContentValidated(printingDataEntity, fileValidatorResult);
@@ -40,7 +41,8 @@ public class PmpMainProcessorValidation implements ItemProcessor<PrintingDataEnt
     private PrintingDataEntity saveContentValidated(@NonNull PrintingDataEntity printingDataEntity, FileValidatorResult fileValidatorResult) {
         try {
             String stringDocument = filesFacade.documentToString((Document) fileValidatorResult.getResult());
-            return repositoryFacade.saveContentValidated(printingDataEntity, filesFacade.stringDocumentToBase64(stringDocument));
+            byte[] bytesDocument = stringDocument.getBytes(StandardCharsets.UTF_8);
+            return repositoryFacade.saveContentValidated(printingDataEntity, bytesDocument);
         } catch (TransformerException e) {
             log.error("{} failed with message: {}", this.getClass().getSimpleName(), e.getMessage(), e);
             throw new ValidationException("Validation failed with message: " + e.getMessage(), e);

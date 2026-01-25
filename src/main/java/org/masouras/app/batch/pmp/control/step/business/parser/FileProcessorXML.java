@@ -43,29 +43,30 @@ public class FileProcessorXML implements FileProcessor {
         Preconditions.checkNotNull(activityType, "activityType must not be null");
         ContentType contentType = (ContentType) params[1];
         Preconditions.checkNotNull(contentType, "contentType must not be null");
-        String validatedBase64Content = (String) params[2];
-        Preconditions.checkNotNull(validatedBase64Content, "validatedBase64Content must not be null");
+        byte[] validatedContent = (byte[]) params[2];
+        if (ArrayUtils.isEmpty(validatedContent)) {
+            throw new IllegalArgumentException("validatedContent can't be empty");
+        }
 
-        return getFileProcessorResultMain(activityType, contentType, validatedBase64Content);
+        return getFileProcessorResultMain(activityType, contentType, validatedContent);
     }
-    private FileProcessorResult getFileProcessorResultMain(ActivityType activityType, ContentType contentType, String validatedBase64Content) {
+    private FileProcessorResult getFileProcessorResultMain(ActivityType activityType, ContentType contentType, byte[] validatedContent) {
         List<PrintingLetterSetUpProjectionImplementor> implementorList = printingLetterSetUpService.getPrintingLetterLookUpMap()
                 .getOrDefault(activityType.getCode(), Map.of())
                 .getOrDefault(contentType.getCode(), List.of());
         if (CollectionUtils.isEmpty(implementorList)) return FileProcessorResult.error("PrintingLetterSetUp not found for ActivityType: " + activityType + " and ContentType: " + contentType);
 
-        final byte[] base64ContentDecoded = Base64.getDecoder().decode(validatedBase64Content);
-        List<String> pdfResultList = implementorList.parallelStream()
+        List<byte[]> pdfResultList = implementorList.parallelStream()
                 .filter(implementor -> implementor.getValidFlag() == ValidFlag.ENABLED)
                 .map(implementor -> new AbstractMap.SimpleEntry<>(implementor, xslTemplateService.getTemplate(implementor.getXslType())))
                 .filter(entry -> ArrayUtils.isNotEmpty(entry.getValue()))
-                .map(entry -> Base64.getEncoder().encodeToString(
+                .map(entry ->
                         pdfRendererService.generatePdf(
                                 entry.getKey().getRendererType(),
-                                base64ContentDecoded,
+                                validatedContent,
                                 entry.getValue()
                         )
-                ))
+                )
                 .toList();
 
         return FileProcessorResult.success(pdfResultList);

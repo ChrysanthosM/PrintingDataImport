@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -90,10 +91,10 @@ public class FileIntegrationService {
     }
 
     private boolean handleAndPersistFileMain(FileOkDto fileOkDto, File relevantFile) {
-        String fileContentBase64 = filesFacade.getContentBase64(relevantFile);
-        if (fileContentBase64 == null) return false;
+        Optional<byte[]> fileContent = filesFacade.getContentBytes(relevantFile);
+        if (fileContent.isEmpty()) return false;
 
-        Long insertedId = repositoryFacade.saveInitialPrintingData(fileOkDto, fileContentBase64);
+        Long insertedId = repositoryFacade.saveInitialPrintingData(fileOkDto, fileContent.get());
         if (log.isDebugEnabled()) log.debug("PrintingData Inserted with ID: {}", insertedId);
 
         return true;
