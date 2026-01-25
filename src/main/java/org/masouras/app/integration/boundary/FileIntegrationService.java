@@ -116,7 +116,5 @@ public class FileIntegrationService {
                 .map(File::new)
                 .filter(file -> file.exists() && file.isFile())
                 .forEach(file -> filesFacade.moveFile(file, errorFolder));
-
-
     }
 }

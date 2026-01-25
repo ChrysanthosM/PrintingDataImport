@@ -17,7 +17,6 @@ import org.masouras.model.mssql.schema.jpa.control.entity.enums.ValidFlag;
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
