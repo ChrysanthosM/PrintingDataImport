@@ -29,6 +29,7 @@ public class PmpStepExecutionListener implements StepExecutionListener {
         BatchStatisticsDetailsEntity batchStatisticsDetailsEntity = batchStatisticsDetailsService.save(
                 BatchStatisticsDetailsEntity.builder()
                         .jobExecutionID(stepExecution.getJobExecutionId())
+                        .jobName(stepExecution.getJobExecution().getJobInstance().getJobName())
                         .stepName(stepExecution.getStepName())
                         .exitStatus(stepExecution.getExitStatus().getExitCode())
                         .startTime(stepExecution.getStartTime())
