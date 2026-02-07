@@ -42,7 +42,7 @@ public class OpenTelemetryConfig {
         return OpenTelemetrySdk.builder()
                 .setTracerProvider(tracerProvider)
                 .setPropagators(ContextPropagators.create(TextMapPropagator.composite(
-                        TextMapPropagator.noop(), // or W3CTraceContextPropagator if you want propagation
+                        TextMapPropagator.noop(), // or W3CTraceContextPropagator for propagation
                         TextMapPropagator.noop()
                 )))
                 .buildAndRegisterGlobal();
