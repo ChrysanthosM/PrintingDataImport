@@ -95,7 +95,7 @@ public class FileIntegrationService {
         if (fileContent.isEmpty()) return false;
 
         Long insertedId = repositoryFacade.saveInitialPrintingData(fileOkDto, fileContent.get());
-        if (log.isDebugEnabled()) log.debug("PrintingData Inserted with ID: {}", insertedId);
+        if (log.isInfoEnabled()) log.info("PrintingData Inserted with ID: {}", insertedId);
 
         return true;
     }

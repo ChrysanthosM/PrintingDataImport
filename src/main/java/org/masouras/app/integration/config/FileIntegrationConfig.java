@@ -1,5 +1,6 @@
 package org.masouras.app.integration.config;
 
+import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.masouras.app.integration.boundary.FileIntegrationService;
@@ -26,11 +27,16 @@ import java.util.List;
 public class FileIntegrationConfig {
     @Value("${watch.folder:#{null}}") private String watchFolder;
     @Value("${error.folder:#{null}}") private String errorFolder;
+    @Value("${archive.folder:#{null}}") private String archiveFolder;
 
     private final FileIntegrationService fileIntegrationService;
 
     @Bean
     public IntegrationFlow okPollingFlow(FileExtensionFilter fileExtensionFilter) {
+        Preconditions.checkNotNull(watchFolder, "watch.folder property must be set");
+        Preconditions.checkNotNull(errorFolder, "error.folder property must be set");
+        Preconditions.checkNotNull(archiveFolder, "archive.folder property must be set");
+
         return IntegrationFlow
                 .from(Files.inboundAdapter(new File(watchFolder))
                                 .filter(new CompositeFileListFilter<>(List.of(
@@ -39,11 +45,11 @@ public class FileIntegrationConfig {
                                 )
                                 .preventDuplicates(true)
                         , e -> e.poller(Pollers.fixedDelay(2000, 1000)))
-                .handle(File.class, (file, headers) -> {
+                .handle(File.class, (file, _) -> {
                     if (!fileIntegrationService.handleAndPersistFile(file)) fileIntegrationService.handleErrorFile(file, errorFolder);
                     return file;
                 })
-                .handle(Files.outboundAdapter(new File("archive"))
+                .handle(Files.outboundAdapter(new File(archiveFolder))
                         .deleteSourceFiles(true))
                 .get();
     }
