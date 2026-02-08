@@ -11,9 +11,9 @@ import org.apache.commons.lang3.Validate;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;
 import org.masouras.data.control.converter.CsvParser;
-import org.masouras.data.control.converter.FileOkAdapter;
-import org.masouras.data.domain.FileOkDto;
-import org.masouras.data.domain.FileOkRaw;
+import org.masouras.data.control.converter.TriggerFileAdapter;
+import org.masouras.data.domain.TriggerFileDto;
+import org.masouras.data.domain.TriggerFileRaw;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
@@ -35,82 +35,82 @@ public class FileIntegrationService {
     @Traceable
     @Timed("handle.and.persist.file")
     @Counted("handle.and.persist.file")
-    public boolean handleAndPersistFile(@NonNull File fileOk) {
-        FileOkRaw fileOkRaw = getFileOkContent(fileOk);
-        if (fileOkRaw == null) {
-            if (log.isWarnEnabled()) log.warn("Expected Content inside file {}", fileOk.getName());
+    public boolean handleAndPersistFile(@NonNull File triggerFile) {
+        TriggerFileRaw triggerFileRaw = getTriggerFileContent(triggerFile);
+        if (triggerFileRaw == null) {
+            if (log.isWarnEnabled()) log.warn("Expected Content inside file {}", triggerFile.getName());
             return false;
         }
-        FileOkDto fileOkDto = getFileOkDto(fileOkRaw, fileOk);
-        if (fileOkDto == null) return false;
+        TriggerFileDto triggerFileDto = getTriggerFileDto(triggerFileRaw, triggerFile);
+        if (triggerFileDto == null) return false;
 
-        File relevantFile = filesFacade.getRelevantFile(fileOk, fileOkDto);
+        File relevantFile = filesFacade.getRelevantFile(triggerFile, triggerFileDto);
         if (!relevantFile.exists() || !relevantFile.isFile()) {
-            if (log.isWarnEnabled()) log.warn("Expected Relevant file '{}' not found for OK file '{}'", relevantFile.getName(), fileOk.getName());
+            if (log.isWarnEnabled()) log.warn("Expected Relevant file '{}' not found for Trigger file '{}'", relevantFile.getName(), triggerFile.getName());
             return false;
         }
 
-        if (!handleAndPersistFileMain(fileOkDto, relevantFile)) {
+        if (!handleAndPersistFileMain(triggerFileDto, relevantFile)) {
             if (log.isWarnEnabled()) log.warn("Relevant file didn't persisted '{}'", relevantFile.getName());
             return false;
         }
 
         filesFacade.deleteFile(relevantFile);
-        if (log.isDebugEnabled()) log.debug("Relevant file persisted '{}'", fileOk.getName());
+        if (log.isDebugEnabled()) log.debug("Relevant file persisted '{}'", triggerFile.getName());
         return true;
     }
-    private @Nullable FileOkDto getFileOkDto(@NonNull FileOkRaw fileOkRaw, @NonNull File fileOk) {
-        FileOkDto fileOkDto = FileOkAdapter.toFileOkDto(fileOkRaw);
-        if (fileOkDto.getFileExtensionType() == null) {
-            if (log.isWarnEnabled()) log.warn("fileExtensionType not found inside file '{}'", fileOk.getName());
+    private @Nullable TriggerFileDto getTriggerFileDto(@NonNull TriggerFileRaw triggerFileRaw, @NonNull File triggerFile) {
+        TriggerFileDto triggerFileDto = TriggerFileAdapter.toTriggerFileDto(triggerFileRaw);
+        if (triggerFileDto.getFileExtensionType() == null) {
+            if (log.isWarnEnabled()) log.warn("fileExtensionType not found inside file '{}'", triggerFile.getName());
             return null;
         }
-        if (EnumUtil.fromCode(FileExtensionType.class, fileOkDto.getFileExtensionType().getCode()) == null) {
-            if (log.isWarnEnabled()) log.warn("fileExtensionType {} not found inside FileExtensionType '{}'", fileOkDto.getFileExtensionType().getCode(), fileOk.getName());
-            return null;
-        }
-
-        if (fileOkDto.getActivityType() == null) {
-            if (log.isWarnEnabled()) log.warn("activityType not found inside file '{}'", fileOk.getName());
-            return null;
-        }
-        if (EnumUtil.fromCode(ActivityType.class, fileOkDto.getActivityType().getCode()) == null) {
-            if (log.isWarnEnabled()) log.warn("activityType {} not found inside ActivityType '{}'", fileOkDto.getActivityType().getCode(), fileOk.getName());
+        if (EnumUtil.fromCode(FileExtensionType.class, triggerFileDto.getFileExtensionType().getCode()) == null) {
+            if (log.isWarnEnabled()) log.warn("fileExtensionType {} not found inside FileExtensionType '{}'", triggerFileDto.getFileExtensionType().getCode(), triggerFile.getName());
             return null;
         }
 
-        if (fileOkDto.getContentType() == null) {
-            if (log.isWarnEnabled()) log.warn("contentType not found inside file '{}'", fileOk.getName());
+        if (triggerFileDto.getActivityType() == null) {
+            if (log.isWarnEnabled()) log.warn("activityType not found inside file '{}'", triggerFile.getName());
             return null;
         }
-        if (EnumUtil.fromCode(ContentType.class, fileOkDto.getContentType().getCode()) == null) {
-            if (log.isWarnEnabled()) log.warn("contentType {} not found inside ContentType '{}'", fileOkDto.getContentType().getCode(), fileOk.getName());
+        if (EnumUtil.fromCode(ActivityType.class, triggerFileDto.getActivityType().getCode()) == null) {
+            if (log.isWarnEnabled()) log.warn("activityType {} not found inside ActivityType '{}'", triggerFileDto.getActivityType().getCode(), triggerFile.getName());
+            return null;
         }
 
-        return fileOkDto;
+        if (triggerFileDto.getContentType() == null) {
+            if (log.isWarnEnabled()) log.warn("contentType not found inside file '{}'", triggerFile.getName());
+            return null;
+        }
+        if (EnumUtil.fromCode(ContentType.class, triggerFileDto.getContentType().getCode()) == null) {
+            if (log.isWarnEnabled()) log.warn("contentType {} not found inside ContentType '{}'", triggerFileDto.getContentType().getCode(), triggerFile.getName());
+        }
+
+        return triggerFileDto;
     }
 
-    private boolean handleAndPersistFileMain(FileOkDto fileOkDto, File relevantFile) {
+    private boolean handleAndPersistFileMain(TriggerFileDto triggerFileDto, File relevantFile) {
         Optional<byte[]> fileContent = filesFacade.getContentBytes(relevantFile);
         if (fileContent.isEmpty()) return false;
 
-        Long insertedId = repositoryFacade.saveInitialPrintingData(fileOkDto, fileContent.get());
+        Long insertedId = repositoryFacade.saveInitialPrintingData(triggerFileDto, fileContent.get());
         if (log.isInfoEnabled()) log.info("PrintingData Inserted with ID: {}", insertedId);
 
         return true;
     }
 
-    public @Nullable FileOkRaw getFileOkContent(@NonNull File fileOk) {
-        List<FileOkRaw> fileOkRawList = filesFacade.getCsvContent(FileOkRaw.class, CsvParser.DelimiterType.PIPE, fileOk);
-        return CollectionUtils.isEmpty(fileOkRawList) ? null : fileOkRawList.getFirst();
+    public @Nullable TriggerFileRaw getTriggerFileContent(@NonNull File triggerFile) {
+        List<TriggerFileRaw> triggerFileRawList = filesFacade.getCsvContent(TriggerFileRaw.class, CsvParser.DelimiterType.PIPE, triggerFile);
+        return CollectionUtils.isEmpty(triggerFileRawList) ? null : triggerFileRawList.getFirst();
     }
 
 
-    public void handleErrorFile(@NonNull File fileOk, String errorFolder) {
+    public void handleErrorFile(@NonNull File triggerFile, String errorFolder) {
         Validate.notBlank(errorFolder);
 
-        filesFacade.copyFile(fileOk, errorFolder);
-        List<String> possibleRelevantFileNames = filesFacade.getPossibleRelevantFileNames(fileOk);
+        filesFacade.copyFile(triggerFile, errorFolder);
+        List<String> possibleRelevantFileNames = filesFacade.getPossibleRelevantFileNames(triggerFile);
         if (CollectionUtils.isEmpty(possibleRelevantFileNames)) return;
         possibleRelevantFileNames.stream()
                 .map(File::new)

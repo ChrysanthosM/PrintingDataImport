@@ -32,7 +32,7 @@ public class FileIntegrationConfig {
     private final FileIntegrationService fileIntegrationService;
 
     @Bean
-    public IntegrationFlow okPollingFlow(FileExtensionFilter fileExtensionFilter) {
+    public IntegrationFlow batchPollingFlow(FileExtensionFilter fileExtensionFilter) {
         Preconditions.checkNotNull(watchFolder, "watch.folder property must be set");
         Preconditions.checkNotNull(errorFolder, "error.folder property must be set");
         Preconditions.checkNotNull(archiveFolder, "archive.folder property must be set");
@@ -40,8 +40,8 @@ public class FileIntegrationConfig {
         return IntegrationFlow
                 .from(Files.inboundAdapter(new File(watchFolder))
                                 .filter(new CompositeFileListFilter<>(List.of(
-                                        fileExtensionFilter,
-                                        new AcceptOnceFileListFilter<>()
+                                        fileExtensionFilter
+//                                        new AcceptOnceFileListFilter<>()
                                         ))
                                 )
                                 .preventDuplicates(false)

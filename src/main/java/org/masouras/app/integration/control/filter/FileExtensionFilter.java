@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class FileExtensionFilter implements FileListFilter<File> {
-    private final Set<String> ALLOWED_EXTENSIONS = Set.of("ok");
+    private final Set<String> ALLOWED_EXTENSIONS = Set.of("batch");
 
     @Override
     public @NonNull List<File> filterFiles(File[] files) {
