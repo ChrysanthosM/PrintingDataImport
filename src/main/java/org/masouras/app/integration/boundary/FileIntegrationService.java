@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
+import org.masouras.app.trace.annotation.Traceable;
 import org.masouras.data.boundary.FilesFacade;
 import org.masouras.data.boundary.RepositoryFacade;
 import org.masouras.data.control.converter.CsvParser;
@@ -18,7 +19,6 @@ import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
 import org.masouras.model.mssql.schema.jpa.control.util.EnumUtil;
-import org.masouras.trace.annotation.Traceable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
