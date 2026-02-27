@@ -13,7 +13,6 @@ import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.file.dsl.Files;
-import org.springframework.integration.file.filters.AcceptOnceFileListFilter;
 import org.springframework.integration.file.filters.CompositeFileListFilter;
 
 import java.io.File;
@@ -41,7 +40,6 @@ public class FileIntegrationConfig {
                 .from(Files.inboundAdapter(new File(watchFolder))
                                 .filter(new CompositeFileListFilter<>(List.of(
                                         fileExtensionFilter
-//                                        new AcceptOnceFileListFilter<>()
                                         ))
                                 )
                                 .preventDuplicates(false)
