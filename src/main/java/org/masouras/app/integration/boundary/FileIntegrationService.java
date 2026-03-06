@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 import org.masouras.app.trace.annotation.Traceable;
 import org.masouras.data.boundary.FilesFacade;
@@ -18,10 +19,12 @@ import org.masouras.data.domain.TriggerFileRaw;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
 import org.masouras.model.mssql.schema.jpa.control.util.EnumUtil;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +63,14 @@ public class FileIntegrationService {
         return true;
     }
     private @Nullable TriggerFileDto getTriggerFileDto(@NonNull TriggerFileRaw triggerFileRaw, @NonNull File triggerFile) {
-        TriggerFileDto triggerFileDto = TriggerFileAdapter.toTriggerFileDto(triggerFileRaw);
+        Optional<PrintingWayType> printingWayType = Arrays.stream(PrintingWayType.values())
+                .filter(way -> way.name().equals(FilenameUtils.getExtension(triggerFile.getName().toUpperCase()))).findFirst();
+        if (printingWayType.isEmpty()) {
+            if (log.isWarnEnabled()) log.warn("PrintingWayType not found for file '{}'", triggerFile.getName());
+            return null;
+        }
+
+        TriggerFileDto triggerFileDto = TriggerFileAdapter.toTriggerFileDto(triggerFileRaw, printingWayType.get());
         if (triggerFileDto.getFileExtensionType() == null) {
             if (log.isWarnEnabled()) log.warn("fileExtensionType not found inside file '{}'", triggerFile.getName());
             return null;
