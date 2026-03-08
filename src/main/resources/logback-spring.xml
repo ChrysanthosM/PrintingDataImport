@@ -8,19 +8,12 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
         </encoder>
 
-        <!-- Rolling policy: rotate daily -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- File name pattern for rotated logs -->
-            <fileNamePattern>logs/myapp.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <!-- Keep 30 days of history -->
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-
-        <!-- Optional: size-based triggering policy -->
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <!-- Rotate if file exceeds 10 MB -->
+        <!-- Rolling policy: rotate daily + size-based -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/myapp.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
-        </triggeringPolicy>
+            <maxHistory>1</maxHistory>
+        </rollingPolicy>
     </appender>
 
     <!-- Console Appender -->

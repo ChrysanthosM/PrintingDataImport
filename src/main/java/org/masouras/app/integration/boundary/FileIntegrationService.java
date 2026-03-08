@@ -9,13 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
-import org.masouras.app.trace.annotation.Traceable;
-import org.masouras.data.boundary.FilesFacade;
-import org.masouras.data.boundary.RepositoryFacade;
 import org.masouras.data.control.converter.CsvParser;
 import org.masouras.data.control.converter.TriggerFileAdapter;
 import org.masouras.data.domain.TriggerFileDto;
 import org.masouras.data.domain.TriggerFileRaw;
+import org.masouras.data.facade.FilesFacade;
+import org.masouras.data.facade.RepositoryFacade;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.FileExtensionType;
@@ -35,7 +34,6 @@ public class FileIntegrationService {
     private final FilesFacade filesFacade;
     private final RepositoryFacade repositoryFacade;
 
-    @Traceable
     @Timed("handle.and.persist.file")
     @Counted("handle.and.persist.file")
     public boolean handleAndPersistFile(@NonNull File triggerFile) {
