@@ -3,6 +3,7 @@ package org.masouras.app.integration.control.filter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jspecify.annotations.NonNull;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
 import org.springframework.integration.file.filters.FileListFilter;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class FileExtensionFilter implements FileListFilter<File> {
-    private final Set<String> ALLOWED_EXTENSIONS = Set.of("batch");
+    private final Set<String> ALLOWED_EXTENSIONS = Set.of(
+            PrintingWayType.BATCH.name().toLowerCase(),
+            PrintingWayType.ARTEMIS.name().toLowerCase());
 
     @Override
     public @NonNull List<File> filterFiles(File[] files) {
