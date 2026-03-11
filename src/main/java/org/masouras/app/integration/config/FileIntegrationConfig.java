@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.aop.Advice;
 import org.masouras.app.integration.boundary.FileIntegrationService;
+import org.masouras.app.integration.control.domain.FileProcessingState;
 import org.masouras.app.integration.control.filter.FileExtensionFilter;
 import org.masouras.app.integration.control.filter.FileListTTLFilter;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,25 +53,19 @@ public class FileIntegrationConfig {
                                 ))
                                 .preventDuplicates(false),
                         e -> e.poller(Pollers.fixedDelay(1000).maxMessagesPerPoll(100)))
+
                 .channel(MessageChannels.executor(Executors.newFixedThreadPool(10)))
-                .handle(fileProcessor(fileIntegrationService, errorFolder), e -> e.advice(fileRetryAdvice()))
+                .handle(fileProcessorInitial(fileIntegrationService, errorFolder))
+
+                .channel(MessageChannels.executor(Executors.newFixedThreadPool(10)))
+                .handle(fileProcessorValidate(fileIntegrationService, errorFolder))
+
+                .transform(FileProcessingState::getFile)
                 .channel(MessageChannels.queue(500))
-                .handle(Files.outboundAdapter(new File(archiveFolder))
-                                .deleteSourceFiles(true),
-                        e -> e.advice(fileRetryAdvice()))
+                .handle(Files.outboundAdapter(new File(archiveFolder)).deleteSourceFiles(true), e -> e.advice(fileRetryAdvice()))
+
                 .get();
     }
-
-    @Bean
-    public GenericHandler<File> fileProcessor(FileIntegrationService fileIntegrationService, String errorFolder) {
-        return (file, _) -> {
-            if (!fileIntegrationService.handleAndPersistFile(file)) {
-                fileIntegrationService.handleErrorFile(file, errorFolder);
-            }
-            return file;
-        };
-    }
-
     @Bean
     public Advice fileRetryAdvice() {
         return RetryInterceptorBuilder.stateless()
@@ -79,6 +74,30 @@ public class FileIntegrationConfig {
                 .build();
     }
 
+
+    @Bean
+    public GenericHandler<File> fileProcessorInitial(FileIntegrationService fileIntegrationService, String errorFolder) {
+        return (file, _) -> {
+            Long insertedId = fileIntegrationService.handleAndPersistInitialPrintingData(file);
+            if (insertedId == null) {
+                fileIntegrationService.handleErrorFile(file, errorFolder);
+                throw new IllegalStateException("Failed to process initial file: " + file.getName());
+            }
+            return new FileProcessingState(file, insertedId);
+        };
+    }
+
+    @Bean
+    public GenericHandler<FileProcessingState> fileProcessorValidate(FileIntegrationService fileIntegrationService, String errorFolder) {
+        return (fileProcessingState, _) -> {
+            if (!fileIntegrationService.handleAndValidatePrintingData(fileProcessingState.getInsertedId())) {
+                fileIntegrationService.handleErrorFile(fileProcessingState.getFile(), errorFolder);
+                throw new IllegalStateException("Failed to validate file: " + fileProcessingState.getFile().getName());
+            }
+            return fileProcessingState;
+        };
+    }
 }
+
 
 

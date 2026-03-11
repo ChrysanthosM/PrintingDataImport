@@ -14,6 +14,7 @@ import org.masouras.control.converter.TriggerFileAdapter;
 import org.masouras.domain.TriggerFileDto;
 import org.masouras.domain.TriggerFileRaw;
 import org.masouras.facade.FilesFacade;
+import org.masouras.facade.PrintingDataEntityFacade;
 import org.masouras.facade.RepositoryFacade;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ActivityType;
 import org.masouras.model.mssql.schema.jpa.control.entity.enums.ContentType;
@@ -33,32 +34,34 @@ import java.util.Optional;
 public class FileIntegrationService {
     private final FilesFacade filesFacade;
     private final RepositoryFacade repositoryFacade;
+    private final PrintingDataEntityFacade printingDataEntityFacade;
 
-    @Timed("handle.and.persist.file")
-    @Counted("handle.and.persist.file")
-    public boolean handleAndPersistFile(@NonNull File triggerFile) {
+    @Timed("handle.and.persist.initial.printing.data")
+    @Counted("handle.and.persist.initial.printing.data")
+    public Long handleAndPersistInitialPrintingData(@NonNull File triggerFile) {
         TriggerFileRaw triggerFileRaw = getTriggerFileContent(triggerFile);
         if (triggerFileRaw == null) {
             if (log.isWarnEnabled()) log.warn("Expected Content inside file {}", triggerFile.getName());
-            return false;
+            return null;
         }
         TriggerFileDto triggerFileDto = getTriggerFileDto(triggerFileRaw, triggerFile);
-        if (triggerFileDto == null) return false;
+        if (triggerFileDto == null) return null;
 
         File relevantFile = filesFacade.getRelevantFile(triggerFile, triggerFileDto);
         if (!relevantFile.exists() || !relevantFile.isFile()) {
             if (log.isWarnEnabled()) log.warn("Expected Relevant file '{}' not found for Trigger file '{}'", relevantFile.getName(), triggerFile.getName());
-            return false;
+            return null;
         }
 
-        if (!handleAndPersistFileMain(triggerFileDto, relevantFile)) {
+        Long insertedId = handleAndPersistInitialPrintingDataMain(triggerFileDto, relevantFile);
+        if (insertedId == null) {
             if (log.isWarnEnabled()) log.warn("Relevant file didn't persisted '{}'", relevantFile.getName());
-            return false;
+            return null;
         }
 
         filesFacade.deleteFile(relevantFile);
         if (log.isDebugEnabled()) log.debug("Relevant file persisted '{}'", triggerFile.getName());
-        return true;
+        return insertedId;
     }
     private @Nullable TriggerFileDto getTriggerFileDto(@NonNull TriggerFileRaw triggerFileRaw, @NonNull File triggerFile) {
         Optional<PrintingWayType> printingWayType = Arrays.stream(PrintingWayType.values())
@@ -98,14 +101,13 @@ public class FileIntegrationService {
         return triggerFileDto;
     }
 
-    private boolean handleAndPersistFileMain(TriggerFileDto triggerFileDto, File relevantFile) {
+    private Long handleAndPersistInitialPrintingDataMain(TriggerFileDto triggerFileDto, File relevantFile) {
         Optional<byte[]> fileContent = filesFacade.getContentBytes(relevantFile);
-        if (fileContent.isEmpty()) return false;
+        if (fileContent.isEmpty()) return null;
 
         Long insertedId = repositoryFacade.saveInitialPrintingData(triggerFileDto, fileContent.get());
         if (log.isInfoEnabled()) log.info("PrintingData Inserted with ID: {}", insertedId);
-
-        return true;
+        return insertedId;
     }
 
     public @Nullable TriggerFileRaw getTriggerFileContent(@NonNull File triggerFile) {
@@ -113,6 +115,12 @@ public class FileIntegrationService {
         return CollectionUtils.isEmpty(triggerFileRawList) ? null : triggerFileRawList.getFirst();
     }
 
+    @Timed("handle.and.validate.printing.data")
+    @Counted("handle.and.validate.printing.data")
+    public boolean handleAndValidatePrintingData(@NonNull Long insertedId) {
+        printingDataEntityFacade.validatePrintingDataEntity(insertedId);
+        return true;
+    }
 
     public void handleErrorFile(@NonNull File triggerFile, String errorFolder) {
         Validate.notBlank(errorFolder);
