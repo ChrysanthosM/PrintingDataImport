@@ -8,6 +8,9 @@ import org.masouras.app.integration.boundary.FileIntegrationService;
 import org.masouras.app.integration.control.domain.FileProcessingState;
 import org.masouras.app.integration.control.filter.FileExtensionFilter;
 import org.masouras.app.integration.control.filter.FileListTTLFilter;
+import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingStatus;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,6 +63,9 @@ public class FileIntegrationConfig {
                 .channel(MessageChannels.executor(Executors.newFixedThreadPool(10)))
                 .handle(fileProcessorValidate(fileIntegrationService, errorFolder))
 
+                .channel(MessageChannels.executor(Executors.newFixedThreadPool(10)))
+                .handle(fileProcessorSendToArtemis(fileIntegrationService, errorFolder))
+
                 .transform(FileProcessingState::getFile)
                 .channel(MessageChannels.queue(500))
                 .handle(Files.outboundAdapter(new File(archiveFolder)).deleteSourceFiles(true), e -> e.advice(fileRetryAdvice()))
@@ -90,9 +96,24 @@ public class FileIntegrationConfig {
     @Bean
     public GenericHandler<FileProcessingState> fileProcessorValidate(FileIntegrationService fileIntegrationService, String errorFolder) {
         return (fileProcessingState, _) -> {
-            if (!fileIntegrationService.handleAndValidatePrintingData(fileProcessingState.getInsertedId())) {
+            PrintingDataEntity validatedEntity = fileIntegrationService.handleAndValidatePrintingData(fileProcessingState.getInsertedId());
+            if (validatedEntity == null || validatedEntity.getPrintingStatus() != PrintingStatus.VALIDATED) {
                 fileIntegrationService.handleErrorFile(fileProcessingState.getFile(), errorFolder);
                 throw new IllegalStateException("Failed to validate file: " + fileProcessingState.getFile().getName());
+            }
+            fileProcessingState.setPrintingDataEntity(validatedEntity);
+            return fileProcessingState;
+        };
+    }
+
+    @Bean
+    public GenericHandler<FileProcessingState> fileProcessorSendToArtemis(FileIntegrationService fileIntegrationService, String errorFolder) {
+        return (fileProcessingState, _) -> {
+            if (fileProcessingState.getPrintingDataEntity().getPrintingWayType() == PrintingWayType.ARTEMIS) {
+                if (!fileIntegrationService.handleAndSendPrintingDataToArtemis(fileProcessingState.getInsertedId())) {
+                    fileIntegrationService.handleErrorFile(fileProcessingState.getFile(), errorFolder);
+                    throw new IllegalStateException("Failed to sent to Artemis file: " + fileProcessingState.getFile().getName());
+                }
             }
             return fileProcessingState;
         };
