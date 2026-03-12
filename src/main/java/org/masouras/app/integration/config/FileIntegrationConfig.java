@@ -78,7 +78,7 @@ public class FileIntegrationConfig {
     @Bean
     public GenericHandler<File> fileProcessorInitial(FileIntegrationService fileIntegrationService, String errorFolder) {
         return (file, _) -> {
-            Long insertedId = fileIntegrationService.handleAndPersistInitialPrintingData(file);
+            Long insertedId = fileIntegrationService.handleAndInitialPersistPrintingData(file);
             if (insertedId == null) {
                 fileIntegrationService.handleErrorFile(file, errorFolder);
                 throw new IllegalStateException("Failed to process initial file: " + file.getName());
