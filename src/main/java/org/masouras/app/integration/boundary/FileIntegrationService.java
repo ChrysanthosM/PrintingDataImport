@@ -1,5 +1,6 @@
 package org.masouras.app.integration.boundary;
 
+import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.masouras.app.artemis.business.printing.model.PrintingJobMessage;
 import org.masouras.facade.FilesFacade;
 import org.masouras.facade.PrintingDataEntityFacade;
 import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -27,8 +29,8 @@ public class FileIntegrationService {
         return printingDataEntityFacade.initialPersist(triggerFile);
     }
 
-    public PrintingDataEntity handleAndValidatePrintingData(@NonNull Long insertedId) {
-        return printingDataEntityFacade.validatePrintingDataEntity(insertedId);
+    public PrintingDataEntity handleAndValidatePrintingData(@NonNull Long insertedId, @Nullable PrintingWayType checkPrintingWayType) {
+        return printingDataEntityFacade.validatePrintingDataEntity(insertedId, checkPrintingWayType);
     }
 
     public boolean handleAndSendPrintingDataToArtemis(@NonNull Long printingId) {

@@ -96,14 +96,14 @@ public class FileIntegrationConfig {
     @Bean
     public GenericHandler<FileProcessingState> fileProcessorValidate(FileIntegrationService fileIntegrationService, String errorFolder) {
         return (fileProcessingState, _) -> {
-            if (fileProcessingState.getPrintingDataEntity().getPrintingWayType() == PrintingWayType.ARTEMIS) {
-                PrintingDataEntity validatedEntity = fileIntegrationService.handleAndValidatePrintingData(fileProcessingState.getInsertedId());
-                if (validatedEntity == null || validatedEntity.getPrintingStatus() != PrintingStatus.VALIDATED) {
-                    fileIntegrationService.handleErrorFile(fileProcessingState.getFile(), errorFolder);
-                    throw new IllegalStateException("Failed to validate file: " + fileProcessingState.getFile().getName());
-                }
-                fileProcessingState.setPrintingDataEntity(validatedEntity);
+            PrintingDataEntity validatedEntity = fileIntegrationService.handleAndValidatePrintingData(fileProcessingState.getInsertedId(), PrintingWayType.ARTEMIS);
+            if (validatedEntity == null
+                    || (validatedEntity.getPrintingWayType() == PrintingWayType.ARTEMIS
+                    && validatedEntity.getPrintingStatus() != PrintingStatus.VALIDATED)) {
+                fileIntegrationService.handleErrorFile(fileProcessingState.getFile(), errorFolder);
+                throw new IllegalStateException("Failed to validate file: " + fileProcessingState.getFile().getName());
             }
+            fileProcessingState.setPrintingDataEntity(validatedEntity);
             return fileProcessingState;
         };
     }
