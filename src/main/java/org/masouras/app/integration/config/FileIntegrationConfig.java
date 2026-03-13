@@ -87,7 +87,8 @@ public class FileIntegrationConfig {
             Long insertedId = fileIntegrationService.handleAndInitialPersistPrintingData(file);
             if (insertedId == null) {
                 fileIntegrationService.handleErrorFile(file, errorFolder);
-                throw new IllegalStateException("Failed to process initial file: " + file.getName());
+                if (log.isWarnEnabled()) log.warn("Failed to process initial file: {}", file.getName());
+                return new FileProcessingState(file, null);
             }
             return new FileProcessingState(file, insertedId);
         };
@@ -96,12 +97,13 @@ public class FileIntegrationConfig {
     @Bean
     public GenericHandler<FileProcessingState> fileProcessorValidate(FileIntegrationService fileIntegrationService, String errorFolder) {
         return (fileProcessingState, _) -> {
+            if (fileProcessingState.getInsertedId() == null) return fileProcessingState;
             PrintingDataEntity validatedEntity = fileIntegrationService.handleAndValidatePrintingData(fileProcessingState.getInsertedId(), PrintingWayType.ARTEMIS);
             if (validatedEntity == null
                     || (validatedEntity.getPrintingWayType() == PrintingWayType.ARTEMIS
                     && validatedEntity.getPrintingStatus() != PrintingStatus.VALIDATED)) {
                 fileIntegrationService.handleErrorFile(fileProcessingState.getFile(), errorFolder);
-                throw new IllegalStateException("Failed to validate file: " + fileProcessingState.getFile().getName());
+                if (log.isWarnEnabled()) log.warn("Failed to validate file: {}", fileProcessingState.getFile().getName());
             }
             fileProcessingState.setPrintingDataEntity(validatedEntity);
             return fileProcessingState;
@@ -111,6 +113,7 @@ public class FileIntegrationConfig {
     @Bean
     public GenericHandler<FileProcessingState> fileProcessorSendToArtemis(FileIntegrationService fileIntegrationService, String errorFolder) {
         return (fileProcessingState, _) -> {
+            if (fileProcessingState.getInsertedId() == null) return fileProcessingState;
             if (fileProcessingState.getPrintingDataEntity().getPrintingWayType() == PrintingWayType.ARTEMIS) {
                 if (!fileIntegrationService.handleAndSendPrintingDataToArtemis(fileProcessingState.getInsertedId())) {
                     fileIntegrationService.handleErrorFile(fileProcessingState.getFile(), errorFolder);
