@@ -1,6 +1,5 @@
 package org.masouras.app.integration.config;
 
-import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.aop.Advice;
@@ -26,6 +25,7 @@ import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 
 @Configuration
@@ -42,9 +42,9 @@ public class FileIntegrationConfig {
 
     @Bean
     public IntegrationFlow batchPollingFlow(FileExtensionFilter fileExtensionFilter, FileListTTLFilter fileListTTLFilter) {
-        Preconditions.checkNotNull(watchFolder, "watch.folder property must be set");
-        Preconditions.checkNotNull(errorFolder, "error.folder property must be set");
-        Preconditions.checkNotNull(archiveFolder, "archive.folder property must be set");
+        Objects.requireNonNull(watchFolder, "watch.folder property must be set");
+        Objects.requireNonNull(errorFolder, "error.folder property must be set");
+        Objects.requireNonNull(archiveFolder, "archive.folder property must be set");
 
         return IntegrationFlow
                 .from(Files.inboundAdapter(new File(watchFolder))
