@@ -37,6 +37,7 @@ public class FileIntegrationConfig {
     @Value("${watch.folder:#{null}}") private String watchFolder;
     @Value("${error.folder:#{null}}") private String errorFolder;
     @Value("${archive.folder:#{null}}") private String archiveFolder;
+    @Value("${thread.pool.size:#{1}}") private int threadPoolSize;
 
     private final FileIntegrationService fileIntegrationService;
 
@@ -57,13 +58,13 @@ public class FileIntegrationConfig {
                                 .preventDuplicates(false),
                         e -> e.poller(Pollers.fixedDelay(1000).maxMessagesPerPoll(100)))
 
-                .channel(MessageChannels.executor(Executors.newFixedThreadPool(10)))
+                .channel(MessageChannels.executor(Executors.newFixedThreadPool(threadPoolSize)))
                 .handle(fileProcessorInitial(fileIntegrationService, errorFolder))
 
-                .channel(MessageChannels.executor(Executors.newFixedThreadPool(10)))
+                .channel(MessageChannels.executor(Executors.newFixedThreadPool(threadPoolSize)))
                 .handle(fileProcessorValidate(fileIntegrationService, errorFolder))
 
-                .channel(MessageChannels.executor(Executors.newFixedThreadPool(10)))
+                .channel(MessageChannels.executor(Executors.newFixedThreadPool(threadPoolSize)))
                 .handle(fileProcessorSendToArtemis(fileIntegrationService, errorFolder))
 
                 .transform(FileProcessingState::getFile)
