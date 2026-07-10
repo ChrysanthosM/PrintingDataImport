@@ -10,8 +10,8 @@ import org.masouras.app.artemis.business.printing.boundary.ProduceArtemisPrintin
 import org.masouras.app.artemis.business.printing.model.PrintingJobMessage;
 import org.masouras.facade.FilesFacade;
 import org.masouras.facade.PrintingDataEntityFacade;
-import org.masouras.model.mssql.schema.jpa.control.entity.PrintingDataEntity;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
+import org.masouras.model.maria.schema.jpa.control.entity.PrintingDataEntity;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.PrintingWayType;
 import org.springframework.stereotype.Service;
 
 import java.io.File;

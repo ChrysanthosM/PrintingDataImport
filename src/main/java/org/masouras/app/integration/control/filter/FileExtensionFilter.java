@@ -3,7 +3,7 @@ package org.masouras.app.integration.control.filter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jspecify.annotations.NonNull;
-import org.masouras.model.mssql.schema.jpa.control.entity.enums.PrintingWayType;
+import org.masouras.model.maria.schema.jpa.control.entity.enums.PrintingWayType;
 import org.springframework.integration.file.filters.FileListFilter;
 import org.springframework.stereotype.Component;
 
